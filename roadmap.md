@@ -85,3 +85,9 @@ src/
    4. Advanced Features
    5. UI Polish & Optimization
    6. Testing & Documentation
+
+
+
+
+## Future Scope
+[ ] need to have OIDC (open id connect) support rather than iam access key
