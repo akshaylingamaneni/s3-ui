@@ -28,6 +28,7 @@ import {
 import Link from "next/link"
 import { ThemeToggle } from "./ui/theme-toggle"
 import { UserProfile } from "@clerk/nextjs"
+import { ProfileSwitcher } from "@/components/profile-switcher"
 // Temporary mock data - this will come from your bucket list later
 const mockBuckets = [
   { name: "my-bucket-1", region: "us-east-1" },
@@ -94,7 +95,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild>
+            <SidebarMenuButton size="lg" className="-ml-2" asChild>
               <Link href="/dashboard" className="flex items-center gap-3">
                 <div className="animate-rainbow cursor-pointer border-0 bg-[linear-gradient(#f1f1f1,#f1f1f1),linear-gradient(#f1f1f1_50%,rgba(241,241,241,0.6)_80%,rgba(0,0,0,0)),linear-gradient(90deg,hsl(0,100%,63%),hsl(90,100%,63%),hsl(210,100%,63%),hsl(195,100%,63%),hsl(270,100%,63%))] bg-[length:200%] [background-clip:padding-box,border-box,border-box] [background-origin:border-box] [border:calc(0.08*1rem)_solid_transparent] before:absolute before:bottom-[-20%] before:left-1/2 before:z-[0] before:h-[20%] before:w-[60%] before:-translate-x-1/2 before:animate-rainbow before:bg-[linear-gradient(90deg,hsl(0,100%,63%,0.7),hsl(90,100%,63%,0.7),hsl(210,100%,63%,0.7),hsl(195,100%,63%,0.7),hsl(270,100%,63%,0.7))] before:[filter:blur(calc(0.8*1rem))] dark:bg-[linear-gradient(#121213,#121213),linear-gradient(#121213_50%,rgba(18,18,19,0.6)_80%,rgba(18,18,19,0)),linear-gradient(90deg,hsl(0,100%,63%),hsl(90,100%,63%),hsl(210,100%,63%),hsl(195,100%,63%),hsl(270,100%,63%))] hover:scale-105 active:scale-95 relative flex aspect-square size-8 items-center justify-center rounded-md shadow-sm">
                   <FolderOpen className="size-4 text-zinc-800 dark:text-white relative z-10" />
@@ -109,6 +110,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       
+      <ProfileSwitcher />
+
       <SidebarContent>
         <BucketList />
       </SidebarContent>

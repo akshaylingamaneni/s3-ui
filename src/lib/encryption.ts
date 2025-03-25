@@ -1,17 +1,18 @@
-import { createCipheriv, createDecipheriv, randomBytes } from 'crypto';
+import { createCipheriv, createDecipheriv, randomBytes, scryptSync } from 'crypto';
 
-// In a production environment, this should be stored securely and not in the code
-const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || randomBytes(32).toString('hex');
 const IV_LENGTH = 16;
+// Generate a 32-byte (256-bit) key from the environment variable
+const ENCRYPTION_KEY = scryptSync(process.env.ENCRYPTION_KEY || 'default-key', 'salt', 32);
 
 export async function encrypt(text: string): Promise<string> {
   const iv = randomBytes(IV_LENGTH);
-  const cipher = createCipheriv('aes-256-cbc', Buffer.from(ENCRYPTION_KEY), iv);
+  const cipher = createCipheriv('aes-256-cbc', ENCRYPTION_KEY, iv);
   
   let encrypted = cipher.update(text);
   encrypted = Buffer.concat([encrypted, cipher.final()]);
   
-  return `${iv.toString('hex')}:${encrypted.toString('hex')}`;
+  // Return IV + encrypted data in base64
+  return iv.toString('hex') + ':' + encrypted.toString('hex');
 }
 
 export async function decrypt(text: string): Promise<string> {
@@ -19,7 +20,7 @@ export async function decrypt(text: string): Promise<string> {
   const iv = Buffer.from(ivHex, 'hex');
   const encrypted = Buffer.from(encryptedHex, 'hex');
   
-  const decipher = createDecipheriv('aes-256-cbc', Buffer.from(ENCRYPTION_KEY), iv);
+  const decipher = createDecipheriv('aes-256-cbc', ENCRYPTION_KEY, iv);
   
   let decrypted = decipher.update(encrypted);
   decrypted = Buffer.concat([decrypted, decipher.final()]);

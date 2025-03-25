@@ -48,7 +48,7 @@ export function WorkspaceSettings({ defaultTab = "Aws Settings" }: WorkspaceSett
         </div>
 
         <TabsContent value="Aws Settings" className="border-none p-0 outline-none">
-          <AwsSettings session={session}/>
+          <AwsSettings />
         </TabsContent>
       </Tabs>
     </div>

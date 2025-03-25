@@ -10,13 +10,20 @@ import { Button } from '@/components/ui/button'
 import { Settings2 } from 'lucide-react'
 import { WorkspaceSettings } from '@/components/workspace-settings'
 
-export function UserProfilePopover() {
+interface UserProfilePopoverProps {
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+  defaultTab?: string
+  hideSettings?: boolean
+}
+
+export function UserProfilePopover({ open, onOpenChange, defaultTab = "workspace-settings", hideSettings = false }: UserProfilePopoverProps) {
     const { theme } = useTheme()
-    const [open, setOpen] = React.useState(false)
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogTrigger asChild>
+                {!hideSettings && (
                 <Button
                     variant="ghost"
                     className="flex items-center text-sm text-muted-foreground hover:text-primary hover:bg-zinc-300/50 dark:hover:bg-zinc-700/50 rounded-lg transition-colors group w-full justify-start font-normal"
@@ -24,6 +31,7 @@ export function UserProfilePopover() {
                     <Settings2 className="h-4 w-4 mr-2 -ml-2" />
                     Settings
                 </Button>
+                )}
             </DialogTrigger>
 
             <DialogContent

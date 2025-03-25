@@ -13,6 +13,5 @@ export function createS3Client(credentials: BucketCredentials) {
       accessKeyId: credentials.accessKeyId,
       secretAccessKey: credentials.secretAccessKey,
     },
-    region: credentials.region,
   });
 } 

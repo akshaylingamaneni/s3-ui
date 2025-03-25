@@ -157,17 +157,17 @@ export class AWSCredentialsManager {
     throw new Error('Unsupported credential type');
   }
 
-  async saveCredentials(bucketId: string, credentials: BucketConnectionMethod): Promise<void> {
+  async encryptCredentials(userId: string, credentials: BucketConnectionMethod): Promise<void> {
     // Encrypt sensitive data before storing
     const encryptedCredentials = {
       ...credentials,
       secretAccessKey: credentials.secretAccessKey ? await encrypt(credentials.secretAccessKey) : undefined
     };
-    this.credentials.set(bucketId, encryptedCredentials);
+    this.credentials.set(userId, encryptedCredentials);
   }
 
-  async getCredentials(bucketId: string): Promise<BucketConnectionMethod | undefined> {
-    const credentials = this.credentials.get(bucketId);
+  async getCredentials(userId: string): Promise<BucketConnectionMethod | undefined> {
+    const credentials = this.credentials.get(userId);
     if (!credentials) return undefined;
 
     // Decrypt sensitive data
@@ -177,7 +177,7 @@ export class AWSCredentialsManager {
     };
   }
 
-  async removeCredentials(bucketId: string): Promise<void> {
-    this.credentials.delete(bucketId);
+  async removeCredentials(userId: string): Promise<void> {
+    this.credentials.delete(userId);
   }
 } 
