@@ -4,7 +4,7 @@ import * as React from "react"
 import { ChevronsUpDown, Plus, Settings, Globe } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-import { Dialog, DialogContent } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 
 import {
   DropdownMenu,
@@ -179,6 +179,9 @@ export function ProfileSwitcher() {
 
       <Dialog open={showPublicBucketDialog} onOpenChange={setShowPublicBucketDialog}>
         <DialogContent className="dark:bg-zinc-800">
+          <DialogHeader>
+            <DialogTitle></DialogTitle>
+          </DialogHeader>
           <PublicBucketForm />
         </DialogContent>
       </Dialog>

@@ -4,6 +4,7 @@ import * as z from "zod"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -15,13 +16,15 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { useRouter } from "next/navigation"
 
 const publicBucketSchema = z.object({
   bucketName: z.string().min(1, "Bucket name is required"),
 })
 
 export function PublicBucketForm() {
-  const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter()
+  const queryClient = useQueryClient()
   const [error, setError] = useState<string | null>(null)
 
   const form = useForm<z.infer<typeof publicBucketSchema>>({
@@ -31,30 +34,59 @@ export function PublicBucketForm() {
     },
   })
 
-  const onSubmit = async (data: z.infer<typeof publicBucketSchema>) => {
-    setIsLoading(true)
-    setError(null)
-
-    try {
-      const response = await fetch(`/api/s3/check-public-bucket`, {
+  // Mutation for adding a bucket
+  const { mutate: addBucket, isPending: isLoading } = useMutation({
+    mutationFn: async (data: z.infer<typeof publicBucketSchema>) => {
+      // First check if bucket is accessible
+      const checkResponse = await fetch(`/api/s3/check-public-bucket`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ bucketName: data.bucketName }),
       })
+      console.log("checkResponse", checkResponse)
 
-      const result = await response.json()
-
-      if (result.isAccessible) {
-        // Add to list of accessible public buckets
-        // Navigate to bucket contents
-      } else {
-        setError("Bucket is not publicly accessible or does not exist")
+      const checkResult = await checkResponse.json()
+      if (!checkResult.isAccessible) {
+        throw new Error("Bucket is not publicly accessible or does not exist")
       }
-    } catch (err) {
-      setError("Failed to check bucket accessibility")
-    } finally {
-      setIsLoading(false)
+
+      // If accessible, add to Redis
+      const addResponse = await fetch('/api/storage', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'bucket',
+          data: {
+            id: crypto.randomUUID(),
+            name: data.bucketName,
+            visibility: 'public',
+            region: checkResult.region || 'us-east-1', // Get from check result if available
+            createdAt: Date.now(),
+            updatedAt: Date.now()
+          }
+        })
+      })
+
+      if (!addResponse.ok) {
+        throw new Error("Failed to add bucket")
+      }
+
+      return addResponse.json()
+    },
+    onSuccess: (_, variables) => {
+      // Invalidate storage query to refresh bucket list
+      queryClient.invalidateQueries({ queryKey: ['storage'] })
+      // Navigate to the new bucket
+      router.push(`/dashboard/buckets/${variables.bucketName}`)
+    },
+    onError: (err) => {
+      setError(err instanceof Error ? err.message : "Failed to add bucket")
     }
+  })
+
+  const onSubmit = (data: z.infer<typeof publicBucketSchema>) => {
+    setError(null)
+    addBucket(data)
   }
 
   return (
@@ -94,7 +126,7 @@ export function PublicBucketForm() {
               disabled={isLoading}
               className="w-full"
             >
-              {isLoading ? "Checking..." : "Add Bucket"}
+              {isLoading ? "Adding Bucket..." : "Add Bucket"}
             </Button>
           </form>
         </Form>

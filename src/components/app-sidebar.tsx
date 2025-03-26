@@ -29,6 +29,7 @@ import Link from "next/link"
 import { ThemeToggle } from "./ui/theme-toggle"
 import { UserProfile } from "@clerk/nextjs"
 import { ProfileSwitcher } from "@/components/profile-switcher"
+import { BucketsList } from "./s3/BucketsList"
 // Temporary mock data - this will come from your bucket list later
 const mockBuckets = [
   { name: "my-bucket-1", region: "us-east-1" },
@@ -70,19 +71,7 @@ function BucketList() {
       </CollapsibleTrigger>
       <CollapsibleContent className="list-none">
         <nav className="space-y-0.5 list-none py-1">
-          {mockBuckets.map((bucket) => (
-            <SidebarMenuItem key={bucket.name} className="list-none">
-              <SidebarMenuButton asChild>
-                <Link 
-                  href={`/dashboard/buckets/${bucket.name}`} 
-                  className="flex items-center justify-between px-3 py-1.5 text-sm text-muted-foreground hover:text-primary hover:bg-zinc-300/50 dark:hover:bg-zinc-700/50 rounded-lg transition-colors group w-full"
-                >
-                  <span className="truncate">{bucket.name}</span>
-                  <span className="text-[11px] text-muted-foreground/70 group-hover:text-muted-foreground transition-colors">{bucket.region}</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
+          <BucketsList />
         </nav>
       </CollapsibleContent>
     </Collapsible>
