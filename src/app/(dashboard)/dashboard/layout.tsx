@@ -1,20 +1,15 @@
 import { AppSidebar } from "@/components/app-sidebar"
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
 import { Separator } from "@/components/ui/separator"
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar"
+import { Breadcrumb, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbItem, BreadcrumbList, BreadcrumbPage } from "@/components/ui/breadcrumb"
+import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
+import { UserButton } from "@clerk/nextjs"
+import { GeistSans } from "geist/font/sans"
 
-export default function Page() {
+export default function DashboardLayout({
+  children
+}: {
+  children: React.ReactNode
+}) {
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -41,15 +36,10 @@ export default function Page() {
             </Breadcrumb>
           </div>
         </header>
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-            <div className="bg-muted/50 aspect-video rounded-xl" />
-            <div className="bg-muted/50 aspect-video rounded-xl" />
-            <div className="bg-muted/50 aspect-video rounded-xl" />
-          </div>
-          <div className="bg-muted/50 min-h-[100vh] flex-1 rounded-xl md:min-h-min" />
-        </div>
+        <body className={GeistSans.className}>
+          {children}
+        </body>
       </SidebarInset>
     </SidebarProvider>
   )
-}
+} 
