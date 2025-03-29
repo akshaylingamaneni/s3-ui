@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
-import { auth, clerkClient, currentUser } from '@clerk/nextjs/server'
+import { currentUser } from '@clerk/nextjs/server'
 import { encrypt } from '@/lib/encryption'
+import redis from '@/lib/redis'
 
 export async function POST(req: Request) {
   try {
@@ -19,8 +20,8 @@ export async function POST(req: Request) {
         undefined
     }
 
-    // Get existing credentials array
-    const existingCredentials = (user.privateMetadata.awsCredentials as any[] || [])
+    // Get existing credentials from Redis
+    const existingCredentials = await redis.get<any[]>(`aws_credentials:${user.id}`) || []
 
     // Update or add new profile
     const updatedCredentials = existingCredentials.some(
@@ -33,13 +34,8 @@ export async function POST(req: Request) {
         )
       : [...existingCredentials, encryptedCredentials]
 
-    // Save the updated array back to Clerk
-    const clerk = await clerkClient()
-    await clerk.users.updateUserMetadata(user.id, {
-      privateMetadata: {
-        awsCredentials: updatedCredentials,
-      },
-    })
+    // Save to Redis
+    await redis.set(`aws_credentials:${user.id}`, updatedCredentials)
     
     return NextResponse.json({ success: true })
   } catch (error) {

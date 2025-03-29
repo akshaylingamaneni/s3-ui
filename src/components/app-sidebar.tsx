@@ -6,7 +6,8 @@ import {
   FolderOpen,
   LifeBuoy,
   Send,
-  Settings2
+  Settings2,
+  Settings
 } from "lucide-react"
 import * as React from "react"
 
@@ -30,6 +31,16 @@ import { ThemeToggle } from "./ui/theme-toggle"
 import { UserProfile } from "@clerk/nextjs"
 import { ProfileSwitcher } from "@/components/profile-switcher"
 import { BucketsList } from "./s3/BucketsList"
+import { AwsSettings } from "@/components/aws-settings"
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
+import { Button } from "./ui/button"
+
 // Temporary mock data - this will come from your bucket list later
 const mockBuckets = [
   { name: "my-bucket-1", region: "us-east-1" },
@@ -122,6 +133,27 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}
+          <SidebarMenuItem>
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start gap-2 px-3 py-1.5 text-sm text-muted-foreground hover:text-primary hover:bg-zinc-300/50 dark:hover:bg-zinc-700/50"
+                >
+                  <Settings className="h-4 w-4" />
+                  AWS Settings
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-[400px] sm:w-[540px] dark:bg-zinc-900">
+                <SheetHeader>
+                  <SheetTitle>AWS Settings</SheetTitle>
+                </SheetHeader>
+                <div className="mt-4">
+                  <AwsSettings />
+                </div>
+              </SheetContent>
+            </Sheet>
+          </SidebarMenuItem>
           <SidebarMenuItem>
             <ThemeToggle />
           </SidebarMenuItem>

@@ -190,6 +190,7 @@ export function ProfileSwitcher() {
         open={showProfileDialog} 
         onOpenChange={setShowProfileDialog}
         defaultTab="workspace-settings"
+        hideSettings={true}
       />
     </>
   )

@@ -36,6 +36,9 @@ export const awsCredentialsSchema = z.object({
     profileName: z.string().min(1, "Profile name is required"),
     accessKeyId: z.string().min(16, "Access Key ID must be at least 16 characters"),
     secretAccessKey: z.string().min(32, "Secret Access Key must be at least 32 characters"),
+    endpoint: z.string().url("Must be a valid URL").optional().or(z.literal('')),
+    region: z.string().min(1, "Region is required"),
+    forcePathStyle: z.boolean().optional()
 })
 
 export type AWSCredentials = z.infer<typeof awsCredentialsSchema>
@@ -55,6 +58,9 @@ export function AwsSettings() {
             profileName: "",
             accessKeyId: "",
             secretAccessKey: "",
+            endpoint: "",
+            region: "us-east-1",
+            forcePathStyle: false
         }
     })
 
@@ -155,6 +161,9 @@ export function AwsSettings() {
                         profileName: "",
                         accessKeyId: "",
                         secretAccessKey: "",
+                        endpoint: "",
+                        region: "us-east-1",
+                        forcePathStyle: false
                     })
                 }
             }
@@ -209,6 +218,9 @@ export function AwsSettings() {
                                     profileName: "",
                                     accessKeyId: "",
                                     secretAccessKey: "",
+                                    endpoint: "",
+                                    region: "us-east-1",
+                                    forcePathStyle: false
                                 })
                             }}
                         >
@@ -302,6 +314,70 @@ export function AwsSettings() {
                                                 className="dark:bg-zinc-800 dark:text-zinc-200 dark:border-zinc-600 dark:placeholder:text-zinc-400"
                                             />
                                         </FormControl>
+                                        <FormMessage className="dark:text-red-400" />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="endpoint"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="dark:text-zinc-200">
+                                            Custom Endpoint (Optional)
+                                        </FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                {...field}
+                                                placeholder="https://your-s3-endpoint.com"
+                                                className="dark:bg-zinc-800 dark:text-zinc-200 dark:border-zinc-600 dark:placeholder:text-zinc-400"
+                                            />
+                                        </FormControl>
+                                        <FormMessage className="dark:text-red-400" />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="region"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="dark:text-zinc-200">Region</FormLabel>
+                                        <Select 
+                                            onValueChange={field.onChange} 
+                                            defaultValue={field.value}
+                                        >
+                                            <SelectTrigger className="dark:bg-zinc-800 dark:text-zinc-200 dark:border-zinc-600">
+                                                <SelectValue placeholder="Select a region" />
+                                            </SelectTrigger>
+                                            <SelectContent className="dark:bg-zinc-800 dark:border-zinc-600">
+                                                <SelectItem value="us-east-1">US East (N. Virginia)</SelectItem>
+                                                <SelectItem value="us-west-2">US West (Oregon)</SelectItem>
+                                                {/* Add more regions as needed */}
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage className="dark:text-red-400" />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="forcePathStyle"
+                                render={({ field }) => (
+                                    <FormItem className="flex items-center gap-2">
+                                        <FormControl>
+                                            <input
+                                                type="checkbox"
+                                                checked={field.value}
+                                                onChange={field.onChange}
+                                            />
+                                        </FormControl>
+                                        <FormLabel className="dark:text-zinc-200">
+                                            Force Path Style
+                                        </FormLabel>
                                         <FormMessage className="dark:text-red-400" />
                                     </FormItem>
                                 )}

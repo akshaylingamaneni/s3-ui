@@ -81,3 +81,9 @@ export interface CreateBucketConfig extends Omit<BucketConfig, 'id' | 'createdAt
   accessKeyId: string
   secretAccessKey: string
 }
+
+export interface AWSCredentials {
+  profileName: string
+  accessKeyId: string
+  secretAccessKey: string
+}
