@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
-import { currentUser, clerkClient } from '@clerk/nextjs/server'
+import { currentUser } from '@clerk/nextjs/server'
+import redis from '@/lib/redis'
 
 export async function DELETE(req: Request) {
   try {
@@ -10,23 +11,44 @@ export async function DELETE(req: Request) {
 
     const { profileName } = await req.json()
     
-    const currentCredentials = user.privateMetadata.awsCredentials || []
-    const updatedCredentials = Array.isArray(currentCredentials) 
-      ? currentCredentials.filter(cred => cred.profileName !== profileName)
-      : []
+    const currentCredentials = await redis.get<any[]>(`aws_credentials:${user.id}`) || []
+    
+    const updatedCredentials = currentCredentials.filter(cred => 
+      cred.profileName !== profileName
+    )
 
-    const clerk = await clerkClient()
-    await clerk.users.updateUserMetadata(user.id, {
-      privateMetadata: {
-        awsCredentials: updatedCredentials,
-      },
+    // Update credentials in Redis
+    await redis.set(`aws_credentials:${user.id}`, updatedCredentials)
+
+    // Clean up all buckets associated with this profile
+    const bucketKeys = await redis.hkeys(`user:${user.id}:buckets`)
+    
+    // Get all bucket data to check which ones belong to this profile
+    const bucketsData = await Promise.all(
+      bucketKeys.map(async key => ({
+        key,
+        data: await redis.hget(`user:${user.id}:buckets`, key)
+      }))
+    )
+
+    // Delete buckets associated with this profile
+    const bucketsToDelete = bucketsData
+      .filter(bucket => (bucket.data as any).profileName === profileName)
+      .map(bucket => bucket.key)
+
+    if (bucketsToDelete.length > 0) {
+      await redis.hdel(`user:${user.id}:buckets`, ...bucketsToDelete)
+    }
+
+    return NextResponse.json({ 
+      success: true,
+      deletedBuckets: bucketsToDelete.length
     })
-
-    return NextResponse.json({ success: true })
   } catch (error) {
+    console.error("Delete Profile Error:", error)
     return NextResponse.json({ 
       success: false, 
-      error: "Failed to delete profile"
+      error: error instanceof Error ? error.message : "Failed to delete profile"
     }, { status: 500 })
   }
 } 

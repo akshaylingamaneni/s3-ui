@@ -3,6 +3,7 @@ import { S3Client, ListBucketsCommand } from '@aws-sdk/client-s3'
 import { decrypt } from '@/lib/encryption'
 import redis from '@/lib/redis'
 import { currentUser } from '@clerk/nextjs/server'
+import { createS3Client } from '@/lib/aws/s3-client'
 
 export async function POST(request: NextRequest) {
   try {
@@ -35,14 +36,9 @@ export async function POST(request: NextRequest) {
     // Decrypt the secret key
     const secretAccessKey = await decrypt(fullProfile.secretAccessKey)
     
-    const client = new S3Client({
-      credentials: {
-        accessKeyId: profile.accessKeyId,
-        secretAccessKey: secretAccessKey,
-      },
-      endpoint: profile.endpoint || undefined,
-      region: profile.region,
-      forcePathStyle: profile.forcePathStyle
+    const client = createS3Client({
+      ...profile,
+      secretAccessKey
     })
 
     const command = new ListBucketsCommand({})

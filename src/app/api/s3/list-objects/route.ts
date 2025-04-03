@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { S3Client, ListObjectsV2Command } from "@aws-sdk/client-s3"
+import { createS3Client } from '@/lib/aws/s3-client'
 
 export async function GET(request: NextRequest) {
   // Get query parameters
@@ -16,12 +17,11 @@ export async function GET(request: NextRequest) {
 
   try {
     // Create S3 client
-    const client = new S3Client({
+    const client = createS3Client({
       region: process.env.AWS_REGION || 'us-east-1',
-      credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID || '',
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || '',
-      },
+      profileName: process.env.AWS_PROFILE_NAME || 'default',
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID || '',
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || '',
     })
 
     // Set up the ListObjectsV2Command

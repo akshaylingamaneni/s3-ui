@@ -1,14 +1,16 @@
 import { NextResponse } from 'next/server'
 import { S3Client, ListObjectsV2Command } from "@aws-sdk/client-s3"
-
+import { createS3Client } from '@/lib/aws/s3-client'
 export async function POST(req: Request) {
   try {
     const { bucketName } = await req.json()
     
-    const client = new S3Client({
+    const client = createS3Client({
       region: 'us-east-1',
-      credentials: undefined, // Remove credentials completely for public access
-      forcePathStyle: true // Important for accessing public buckets
+      forcePathStyle: false,
+      profileName: 'default',
+      accessKeyId: '',
+      secretAccessKey: ''
     })
 
     try {

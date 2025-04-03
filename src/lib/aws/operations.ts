@@ -6,7 +6,7 @@ import {
   S3Client 
 } from "@aws-sdk/client-s3";
 import { BucketConnection, S3File } from "@/types/bucket";
-import { createS3Client } from "./config";
+import { createS3Client } from "./s3-client";
 
 interface BucketConnectionMethod {
   type: 'iam_user' | 'sts' | 'sso';

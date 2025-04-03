@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { S3Client, ListBucketsCommand } from '@aws-sdk/client-s3';
+import { createS3Client } from '@/lib/aws/s3-client';
+import { decrypt } from '@/lib/encryption';
 
 export async function POST(request: Request) {
   try {
@@ -8,26 +10,26 @@ export async function POST(request: Request) {
       secretAccessKey, 
       endpoint, 
       region, 
-      forcePathStyle 
+      forcePathStyle,
+      isEncrypted = false  // Add flag to know if key needs decryption
     } = await request.json();
     console.log("accessKeyId", accessKeyId);
     console.log("secretAccessKey", secretAccessKey);
     console.log("endpoint", endpoint);
     console.log("region", region);
     console.log("forcePathStyle", forcePathStyle);
-
-    const client = new S3Client({
-      credentials: {
-        accessKeyId,
-        secretAccessKey,
-      },
-      endpoint: endpoint || undefined,
-      region: region || 'us-east-1',
-      forcePathStyle: forcePathStyle || false
+    console.log("isEncrypted", isEncrypted);
+    const client = createS3Client({
+      accessKeyId,
+      secretAccessKey,
+      endpoint,
+      region,
+      forcePathStyle,
+      profileName: 'default'
     });
 
-    const response = await client.send(new ListBucketsCommand({}));
-    console.log(response);
+    const response = await client.send(new ListBucketsCommand({MaxBuckets: 1}));
+    console.log("response", response);
     return NextResponse.json({ valid: true });
   } catch (error) {
     return NextResponse.json(

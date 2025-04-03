@@ -16,14 +16,25 @@ export async function encrypt(text: string): Promise<string> {
 }
 
 export async function decrypt(text: string): Promise<string> {
-  const [ivHex, encryptedHex] = text.split(':');
-  const iv = Buffer.from(ivHex, 'hex');
-  const encrypted = Buffer.from(encryptedHex, 'hex');
-  
-  const decipher = createDecipheriv('aes-256-cbc', ENCRYPTION_KEY, iv);
-  
-  let decrypted = decipher.update(encrypted);
-  decrypted = Buffer.concat([decrypted, decipher.final()]);
-  
-  return decrypted.toString();
+  try {
+    const [ivHex, encryptedHex] = text.split(':');
+    if (!ivHex || !encryptedHex) {
+      throw new Error('Invalid encrypted text format');
+    }
+
+    const iv = Buffer.from(ivHex, 'hex');
+    const encrypted = Buffer.from(encryptedHex, 'hex');
+    
+    const decipher = createDecipheriv('aes-256-cbc', ENCRYPTION_KEY, iv);
+    
+    let decrypted = Buffer.concat([
+      decipher.update(encrypted),
+      decipher.final()
+    ]);
+    
+    return decrypted.toString('utf8');
+  } catch (error) {
+    console.error('Decryption error:', error);
+    throw new Error('Failed to decrypt');
+  }
 } 

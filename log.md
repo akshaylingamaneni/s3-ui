@@ -25,6 +25,8 @@
         - attention driven? which means we track click? overkill for now
         - 
 4. we have like 10k buckets per account 
+5. bucket life cycle policy, where user has the ability to create 2 buckets(not hard req, need to better put this as a problem statement) and he can move data b/w hot and cold via toggle or via auto policy
+    - example photographer managing multiple projects and moving to cold once done
 
 ### 03/29/25
 ## Approach
@@ -36,3 +38,22 @@
 6. by saving all bucket names in redis can do alphabetically sorted bucket names
 7. need to implement search and filter by letters
 8. makes more sense to group buckets by alphabet when posting so all the buckets with start of letter belong to. can still have hot partitions if people use the same char but for now should be alright
+
+## Tasks by order of priority
+1. handle buckets cleanup when profile is deleted
+2. sync buckets with redis
+    - create a new button to sync buckets
+    - create a sync buckets function
+    - create a sync buckets endpoint
+    - group buckets by alphabet, i.e 26 buckets
+    - schema for buckets
+        - profile id 1
+            - buckets [26 sets of buckets by alphabet]
+        - profile id 2
+            - buckets [26 sets of buckets by alphabet] 
+
+## Things to do
+1. need to handle public buckets, which will not have a profile, or we make it mandatory to add public profile name when creating
+2. need to fix profileName: 'default'
+
+`We strongly recommend using only paginated ListBuckets requests. Unpaginated ListBuckets requests are only supported for Amazon Web Services accounts set to the default general purpose bucket quota of 10,000. If you have an approved general purpose bucket quota above 10,000, you must send paginated ListBuckets requests to list your account’s buckets. All unpaginated ListBuckets requests will be rejected for Amazon Web Services accounts with a general purpose bucket quota greater than 10,000.`

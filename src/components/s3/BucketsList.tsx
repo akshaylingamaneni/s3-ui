@@ -52,7 +52,7 @@ export function BucketsList() {
   }
 
   const allBuckets = data?.pages.flatMap(page => page.buckets) ?? []
-
+  console.log("allBuckets", allBuckets)
   return (
     <SidebarContent className="relative">
       {allBuckets.length === 0 && !isLoading && (
@@ -67,7 +67,7 @@ export function BucketsList() {
       )}>
         {allBuckets.map(bucket => (
           <BucketItem 
-            key={bucket.id} 
+            key={`${bucket.name}-${bucket.region}`} 
             bucket={bucket}
           />
         ))}

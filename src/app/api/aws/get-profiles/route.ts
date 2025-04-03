@@ -9,16 +9,16 @@ export async function GET() {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
     }
 
-    const awsCredentials = await redis.get<any[]>(`aws_credentials:${user.id}`) || []
-    console.log("awsCredentials", awsCredentials)
-    // Return profiles without sensitive data
-    const profiles = awsCredentials.map(cred => ({
+    const credentials = await redis.get<any[]>(`aws_credentials:${user.id}`) || []
+    
+    // Return profiles without decrypting secretAccessKey
+    const profiles = credentials.map(cred => ({
       profileName: cred.profileName,
       accessKeyId: cred.accessKeyId,
-      secretAccessKey: cred.secretAccessKey,
-      region: cred.region,
+      secretAccessKey: cred.secretAccessKey, // Keep encrypted
       endpoint: cred.endpoint,
-      forcePathStyle: cred.forcePathStyle,
+      region: cred.region,
+      forcePathStyle: cred.forcePathStyle
     }))
 
     return NextResponse.json({ 

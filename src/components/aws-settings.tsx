@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/select"
 import { Skeleton } from "@/components/ui/skeleton"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { PlusCircle, Trash2 } from "lucide-react"
+import { PlusCircle, Trash2, Download } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
@@ -69,7 +69,6 @@ export function AwsSettings() {
         const loadProfiles = async () => {
             try {
                 const response = await fetch('/api/aws/get-profiles')
-                console.log(response)
                 const data = await response.json()
                 if (data.success) {
                     setProfiles(data.profiles)
@@ -85,11 +84,23 @@ export function AwsSettings() {
     }, [])
 
     // Handle profile selection
-    const handleProfileSelect = (profileName: string) => {
+    const handleProfileSelect = async (profileName: string) => {
         const profile = profiles.find(p => p.profileName === profileName)
         if (profile) {
             setSelectedProfile(profileName)
-            form.reset(profile)
+            
+            // Decrypt key before showing in form
+            const response = await fetch('/api/aws/decrypt-key', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ encryptedKey: profile.secretAccessKey }),
+            })
+            const data = await response.json()
+            
+            form.reset({
+                ...profile,
+                secretAccessKey: data.success ? data.decryptedKey : ''
+            })
         }
     }
 
@@ -169,6 +180,25 @@ export function AwsSettings() {
             }
         } catch (error) {
             console.error('Failed to delete profile:', error)
+        }
+    }
+
+    const handleImportBuckets = async (profileName: string) => {
+        try {
+            const response = await fetch('/api/aws/import-buckets', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ profileName }),
+            })
+
+            const data = await response.json()
+            if (data.success) {
+                // Show success toast or message
+                setIsSuccess(true)
+            }
+        } catch (error) {
+            console.error('Failed to import buckets:', error)
+            setError('Failed to import buckets')
         }
     }
 
@@ -390,9 +420,18 @@ export function AwsSettings() {
                             )}
 
                             {isSuccess && (
-                                <p className="text-sm text-green-500 dark:text-green-400">
-                                    AWS credentials have been validated and saved successfully.
-                                </p>
+                                <div className="flex flex-col gap-4">
+                                    <p className="text-sm text-green-500 dark:text-green-400">
+                                        AWS credentials have been validated and saved successfully.
+                                    </p>
+                                    <Button
+                                        onClick={() => handleImportBuckets(form.getValues("profileName"))}
+                                        className="w-full flex items-center gap-2 dark:bg-zinc-200 dark:text-zinc-800 cursor-pointer"
+                                    >
+                                        <Download className="h-4 w-4" />
+                                        Sync Buckets
+                                    </Button>
+                                </div>
                             )}
 
                             <Button

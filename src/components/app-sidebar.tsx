@@ -121,15 +121,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {navSecondary.map((item) => (
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton asChild>
-                <a 
+                <Link 
                   href={item.url} 
-                  className="flex items-center px-1
-                  
-                  py-1.5 text-sm text-muted-foreground hover:text-primary hover:bg-zinc-300/50 dark:hover:bg-zinc-700/50 rounded-lg transition-colors group w-full"
+                  className="flex items-center px-2 -ml-1 py-1.5 text-sm text-muted-foreground hover:text-primary hover:bg-zinc-300/50 dark:hover:bg-zinc-700/50 rounded-lg transition-colors group w-full"
                 >
                   <item.icon className="mr-2 h-4 w-4" />
                   <span className="text-sm">{item.title}</span>
-                </a>
+                </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}
@@ -138,10 +136,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <SheetTrigger asChild>
                 <Button 
                   variant="ghost" 
-                  className="w-full justify-start gap-2 px-3 py-1.5 text-sm text-muted-foreground hover:text-primary hover:bg-zinc-300/50 dark:hover:bg-zinc-700/50"
+                  className="w-full justify-start px-1 py-1.5 text-sm font-normal text-muted-foreground hover:text-primary hover:bg-zinc-300/50 dark:hover:bg-zinc-700/50 rounded-lg -ml-2"
                 >
-                  <Settings className="h-4 w-4" />
-                  AWS Settings
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span className="text-sm">AWS Settings</span>
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="w-[400px] sm:w-[540px] dark:bg-zinc-900">
