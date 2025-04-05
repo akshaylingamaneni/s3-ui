@@ -22,8 +22,9 @@ import {
 } from "@/components/ui/sidebar"
 import { UserProfilePopover } from "@/components/user-profile-popover"
 import { PublicBucketForm } from "@/components/public-bucket-form"
+import { useAWSStore } from '@/store/aws-store'
 
-interface AWSProfile {
+export interface AWSProfile {
   profileName: string
   region: string
 }
@@ -32,20 +33,22 @@ export function ProfileSwitcher() {
   const { isMobile } = useSidebar()
   const router = useRouter()
   const [profiles, setProfiles] = React.useState<AWSProfile[]>([])
-  const [activeProfile, setActiveProfile] = React.useState<AWSProfile | null>(null)
   const [isLoading, setIsLoading] = React.useState(true)
   const [showProfileDialog, setShowProfileDialog] = React.useState(false)
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false)
   const [showPublicBucketDialog, setShowPublicBucketDialog] = React.useState(false)
+  
+  const { activeProfile, setActiveProfile } = useAWSStore()
 
   React.useEffect(() => {
     const loadProfiles = async () => {
       try {
         const response = await fetch('/api/aws/get-profiles')
+        console.log("response", response)
         const data = await response.json()
         if (data.success && data.profiles) {
           setProfiles(data.profiles)
-          if (data.profiles.length > 0) {
+          if (data.profiles.length > 0 && !activeProfile) {
             setActiveProfile(data.profiles[0])
           }
         }
@@ -57,11 +60,8 @@ export function ProfileSwitcher() {
     }
 
     loadProfiles()
-  }, [])
+  }, [activeProfile, setActiveProfile])
 
-  const handleCreateProfile = () => {
-    router.push("/user-profile?tab=workspace-settings")
-  }
 
   if (isLoading) {
     return (

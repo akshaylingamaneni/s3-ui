@@ -1,9 +1,9 @@
-import { 
-  ListObjectsV2Command, 
+import {
+  ListObjectsV2Command,
   GetObjectCommand,
   PutObjectCommand,
   DeleteObjectCommand,
-  S3Client 
+  S3Client
 } from "@aws-sdk/client-s3";
 import { BucketConnection, S3File } from "@/types/bucket";
 import { createS3Client } from "./s3-client";
@@ -82,10 +82,10 @@ export class S3Operations {
 
   constructor(connection: BucketConnection) {
     this.client = createS3Client({
-      accessKeyId: connection.accessKeyId,
-      secretAccessKey: connection.secretAccessKey,
-      region: connection.region,
-      bucket: connection.bucket,
+      region: process.env.AWS_REGION || 'us-east-1',
+      profileName: process.env.AWS_PROFILE_NAME || 'default',
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID || '',
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || '',
     });
     this.bucket = connection.bucket;
   }

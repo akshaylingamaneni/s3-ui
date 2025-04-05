@@ -31,7 +31,7 @@ import { ThemeToggle } from "./ui/theme-toggle"
 import { UserProfile } from "@clerk/nextjs"
 import { ProfileSwitcher } from "@/components/profile-switcher"
 import { BucketsList } from "./s3/BucketsList"
-import { AwsSettings } from "@/components/aws-settings"
+import { AWSCredentials, AwsSettings } from "@/components/aws-settings"
 import {
   Sheet,
   SheetContent,
@@ -40,6 +40,8 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet"
 import { Button } from "./ui/button"
+import { useAWSStore } from "@/store/aws-store"
+import { ProfileCombobox } from "./profile-combobox"
 
 // Temporary mock data - this will come from your bucket list later
 const mockBuckets = [
@@ -70,6 +72,7 @@ const navSecondary = [
 
 function BucketList() {
   const [isOpen, setIsOpen] = React.useState(true)
+  const { activeProfile } = useAWSStore()
 
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen} className="list-none">
@@ -82,7 +85,7 @@ function BucketList() {
       </CollapsibleTrigger>
       <CollapsibleContent className="list-none">
         <nav className="space-y-0.5 list-none py-1">
-          <BucketsList />
+          <BucketsList selectedProfile={activeProfile?.profileName || ""} />
         </nav>
       </CollapsibleContent>
     </Collapsible>
@@ -109,8 +112,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-      
-      <ProfileSwitcher />
+      <div className="py-2">
+        <ProfileCombobox />
+      </div>
 
       <SidebarContent>
         <BucketList />

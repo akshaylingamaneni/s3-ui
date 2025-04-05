@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { S3Client, ListBucketsCommand } from '@aws-sdk/client-s3'
-import { decrypt } from '@/lib/encryption'
 import redis from '@/lib/redis'
 import { currentUser } from '@clerk/nextjs/server'
-import { createS3Client } from '@/lib/aws/s3-client'
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,48 +9,31 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
     }
 
-    const { profile, cursor, limit } = await request.json()
-    
+    const { profile, cursor = 0, limit = 50 } = await request.json()
     if (!profile) {
       return NextResponse.json(
-        { error: 'Profile is required' },
+        { error: 'Profile name is required' },
         { status: 400 }
       )
     }
+    const start = Number(cursor) || 0
+    const end = start + (Number(limit) || 50) - 1
 
-    // Get the full profile from Redis to get the encrypted secret key
-    const credentials = await redis.get<any[]>(`aws_credentials:${user.id}`) || []
-    console.log("credentials", credentials)
-    const fullProfile = credentials.find(cred => cred.profileName === profile.profileName)
-
-    if (!fullProfile) {
-      return NextResponse.json(
-        { error: 'Profile not found' },
-        { status: 404 }
-      )
-    }
-
-    // Decrypt the secret key
-    const secretAccessKey = await decrypt(fullProfile.secretAccessKey)
-    
-    const client = createS3Client({
-      ...profile,
-      secretAccessKey
-    })
-
-    const command = new ListBucketsCommand({})
-    const response = await client.send(command)
-
-    const buckets = response.Buckets?.map(bucket => ({
-      name: bucket.Name,
-      creationDate: bucket.CreationDate,
-      region: profile.region,
-      visibility: 'private' // You might want to check actual bucket policy
-    })) || []
+    const buckets = await redis.zrange(
+      `profile:${profile}:buckets`,
+      start,
+      end
+    )
+    const totalBuckets = await redis.zcard(`profile:${profile}:buckets`)
 
     return NextResponse.json({
       buckets,
-      success: true
+      success: true,
+      pagination: {
+        hasMore: start + limit < totalBuckets,
+        total: totalBuckets,
+        nextCursor: start + limit
+      }
     })
   } catch (error) {
     console.error('Error listing buckets:', error)

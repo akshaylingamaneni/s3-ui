@@ -50,64 +50,46 @@ export function useAWSProfiles() {
   })
 }
 
-export function useBuckets() {
-  const { data: profiles } = useAWSProfiles()
-
+export function useBuckets(profile?: string) {
   return useInfiniteQuery<BucketData>({
-    queryKey: ['buckets', profiles],
+    queryKey: ['buckets', profile],
     queryFn: async ({ pageParam = '' }) => {
-      if (!profiles?.length) {
-        return { buckets: [], nextCursor: undefined }
-      }
-
-      // Fetch buckets from all profiles
-      const bucketsPromises = profiles.map(async (profile) => {
-        try {
-          const res = await fetch('/api/buckets', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              profile,
-              cursor: pageParam,
-              limit: PAGE_SIZE
-            })
+      try {
+        const res = await fetch('/api/buckets', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            profile,
+            cursor: pageParam,
+            limit: PAGE_SIZE
           })
-          if (!res.ok) throw new Error(`Failed to fetch buckets for ${profile.profileName}`)
-          const data = await res.json()
-          return {
-            profileName: profile.profileName,
-            buckets: data.buckets
-          }
-        } catch (error) {
-          console.error(`Error fetching buckets for ${profile.profileName}:`, error)
-          return {
-            profileName: profile.profileName,
-            buckets: []
-          }
-        }
-      })
-
-      const results = await Promise.all(bucketsPromises)
-      
-      // Combine all buckets and add profile information
-      const allBuckets = results.flatMap(result => 
-        result.buckets.map((bucket: BucketConfig) => ({
+        })
+        if (!res.ok) throw new Error(`Failed to fetch buckets for ${profile}`)
+        const data = await res.json()
+        
+        // Add profile name to each bucket
+        const buckets = data.buckets.map((bucket: BucketConfig) => ({
           ...bucket,
-          profileName: result.profileName // Add profile name to each bucket
+          profileName: profile
         }))
-      )
 
-      return {
-        buckets: allBuckets,
-        nextCursor: undefined // Pagination might need to be handled differently for multiple profiles
+        return {
+          buckets,
+          nextCursor: data.nextCursor
+        }
+      } catch (error) {
+        console.error(`Error fetching buckets for ${profile}:`, error)
+        throw error
       }
     },
     getNextPageParam: (lastPage) => lastPage.nextCursor,
     initialPageParam: '',
     staleTime: Infinity,
     refetchOnWindowFocus: false,
-    enabled: !!profiles?.length
+    enabled: !!profile,
+    retry: 3,
+    retryDelay: 1000
   })
 } 
