@@ -6,11 +6,26 @@ import {
   FolderOpen,
   LifeBuoy,
   Send,
-  Settings2,
   Settings
 } from "lucide-react"
 import * as React from "react"
 
+import { AwsSettings } from "@/components/settings/aws-settings"
+import { ProfileCombobox } from "@/components/profile/profile-combobox"
+import { BucketsList } from "@/components/s3/BucketsList"
+import { Button } from "@/components/ui/button"
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible"
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
 import {
   Sidebar,
   SidebarContent,
@@ -20,28 +35,10 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { UserProfilePopover } from "@/components/user-profile-popover"
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible"
-import Link from "next/link"
-import { ThemeToggle } from "./ui/theme-toggle"
-import { UserProfile } from "@clerk/nextjs"
-import { ProfileSwitcher } from "@/components/profile-switcher"
-import { BucketsList } from "./s3/BucketsList"
-import { AWSCredentials, AwsSettings } from "@/components/aws-settings"
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet"
-import { Button } from "./ui/button"
+import { ThemeToggle } from "@/components/ui/theme-toggle"
+import { UserProfilePopover } from "@/components/profile/user-profile-popover"
 import { useAWSStore } from "@/store/aws-store"
-import { ProfileCombobox } from "./profile-combobox"
+import Link from "next/link"
 
 // Temporary mock data - this will come from your bucket list later
 const mockBuckets = [

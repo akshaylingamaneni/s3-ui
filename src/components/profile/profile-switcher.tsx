@@ -20,8 +20,8 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { UserProfilePopover } from "@/components/user-profile-popover"
-import { PublicBucketForm } from "@/components/public-bucket-form"
+import { UserProfilePopover } from "@/components/profile/user-profile-popover"
+import { PublicBucketForm } from "@/components/s3/public-bucket-form"
 import { useAWSStore } from '@/store/aws-store'
 
 export interface AWSProfile {

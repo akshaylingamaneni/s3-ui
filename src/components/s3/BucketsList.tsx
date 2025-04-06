@@ -8,7 +8,7 @@ import { SidebarContent } from '@/components/ui/sidebar'
 import { useUser } from '@clerk/nextjs'
 import { useInView } from 'react-intersection-observer'
 import { useEffect, useState } from 'react'
-import { AWSCredentials } from "@/components/aws-settings"
+import { AWSCredentials } from "@/components/settings/aws-settings"
 import { useAWSStore } from '@/store/aws-store'
 import React from 'react'
 

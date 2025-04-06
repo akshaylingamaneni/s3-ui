@@ -1,5 +1,5 @@
 'use client'
-import { AwsSettings } from "@/components/aws-settings"
+import { AwsSettings } from "@/components/settings/aws-settings"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useState, useEffect } from 'react'
 

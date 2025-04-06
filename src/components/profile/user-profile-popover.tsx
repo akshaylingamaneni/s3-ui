@@ -8,7 +8,7 @@ import { DotIcon, Fingerprint, X } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Settings2 } from 'lucide-react'
-import { WorkspaceSettings } from '@/components/workspace-settings'
+import { WorkspaceSettings } from '@/components/settings/workspace-settings'
 
 interface UserProfilePopoverProps {
   open?: boolean
