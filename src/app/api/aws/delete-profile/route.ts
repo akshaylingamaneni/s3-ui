@@ -19,8 +19,8 @@ export async function DELETE(req: Request) {
 
     await redis.set(`aws_credentials:${user.id}`, updatedCredentials)
 
-    const deletedBuckets = await redis.del(`profile:${profileName}:buckets`)
-    const deletedMetadata = await redis.del(`profile:${profileName}:metadata`)
+    const deletedBuckets = await redis.del(`profile:${profileName}:${user.id}:buckets`)
+    const deletedMetadata = await redis.del(`profile:${profileName}:${user.id}:metadata`)
 
     return NextResponse.json({
       success: true,

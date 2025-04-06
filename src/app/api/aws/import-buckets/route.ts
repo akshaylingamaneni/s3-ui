@@ -46,7 +46,7 @@ export async function POST(req: Request) {
 
         // Handle additions and deletions
         if (bucketEntries.length > 0) {
-            const existingBuckets = await redis.zrange(`profile:${profileName}:buckets`, 0, -1)
+            const existingBuckets = await redis.zrange(`profile:${profileName}:${user.id}:buckets`, 0, -1)
             const existingMap = new Map(
                 existingBuckets.map(bucket => {
                     // @ts-ignore
@@ -66,7 +66,7 @@ export async function POST(req: Request) {
                 // Add new buckets
                 for (const bucket of deltaBuckets) {
                     await redis.zadd(
-                        `profile:${profileName}:buckets`,
+                        `profile:${profileName}:${user.id}:buckets`,
                         { nx: true },
                         {
                             score: bucket.name?.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) || 0,
@@ -77,12 +77,12 @@ export async function POST(req: Request) {
 
                 // Remove deleted buckets
                 if (bucketsToDelete.length > 0) {
-                    await redis.zrem(`profile:${profileName}:buckets`, bucketsToDelete)
+                    await redis.zrem(`profile:${profileName}:${user.id}:buckets`, bucketsToDelete)
                 }
                 console.log('bucketsToDelete', bucketsToDelete)
 
                 // Update metadata with deletion info
-                await redis.set(`profile:${profileName}:metadata`, {
+                await redis.set(`profile:${profileName}:${user.id}:metadata`, {
                     lastImported: Date.now(),
                     totalBuckets: buckets.length,
                     region: profile.region,
