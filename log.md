@@ -57,3 +57,7 @@
 2. need to fix profileName: 'default'
 
 `We strongly recommend using only paginated ListBuckets requests. Unpaginated ListBuckets requests are only supported for Amazon Web Services accounts set to the default general purpose bucket quota of 10,000. If you have an approved general purpose bucket quota above 10,000, you must send paginated ListBuckets requests to list your account’s buckets. All unpaginated ListBuckets requests will be rejected for Amazon Web Services accounts with a general purpose bucket quota greater than 10,000.`
+
+### 04/05/25
+## Things to do 
+- [x] when profile is deleted clean up all the buckets

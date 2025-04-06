@@ -10,44 +10,27 @@ export async function DELETE(req: Request) {
     }
 
     const { profileName } = await req.json()
-    
+
     const currentCredentials = await redis.get<any[]>(`aws_credentials:${user.id}`) || []
-    
-    const updatedCredentials = currentCredentials.filter(cred => 
+
+    const updatedCredentials = currentCredentials.filter(cred =>
       cred.profileName !== profileName
     )
 
-    // Update credentials in Redis
     await redis.set(`aws_credentials:${user.id}`, updatedCredentials)
 
-    // Clean up all buckets associated with this profile
-    const bucketKeys = await redis.hkeys(`user:${user.id}:buckets`)
-    
-    // Get all bucket data to check which ones belong to this profile
-    const bucketsData = await Promise.all(
-      bucketKeys.map(async key => ({
-        key,
-        data: await redis.hget(`user:${user.id}:buckets`, key)
-      }))
-    )
+    const deletedBuckets = await redis.del(`profile:${profileName}:buckets`)
+    const deletedMetadata = await redis.del(`profile:${profileName}:metadata`)
 
-    // Delete buckets associated with this profile
-    const bucketsToDelete = bucketsData
-      .filter(bucket => (bucket.data as any).profileName === profileName)
-      .map(bucket => bucket.key)
-
-    if (bucketsToDelete.length > 0) {
-      await redis.hdel(`user:${user.id}:buckets`, ...bucketsToDelete)
-    }
-
-    return NextResponse.json({ 
+    return NextResponse.json({
       success: true,
-      deletedBuckets: bucketsToDelete.length
+      deletedBuckets: deletedBuckets === 1,
+      deletedMetadata: deletedMetadata === 1
     })
   } catch (error) {
     console.error("Delete Profile Error:", error)
-    return NextResponse.json({ 
-      success: false, 
+    return NextResponse.json({
+      success: false,
       error: error instanceof Error ? error.message : "Failed to delete profile"
     }, { status: 500 })
   }
