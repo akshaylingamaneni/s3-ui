@@ -43,7 +43,6 @@ export function PublicBucketForm() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ bucketName: data.bucketName }),
       })
-      console.log("checkResponse", checkResponse)
 
       const checkResult = await checkResponse.json()
       if (!checkResult.isAccessible) {
