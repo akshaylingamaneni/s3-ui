@@ -1,3 +1,4 @@
+import { AWSProfile } from '@/lib/aws/s3-client'
 import { useInfiniteQuery } from '@tanstack/react-query'
 
 // Define the types for the S3 objects response
@@ -19,7 +20,7 @@ export interface S3File {
   isDirectory: boolean
 }
 
-export function useS3Files(bucketName: string | null) {
+export function useS3Files(bucketName: string | null, activeProfile: string | undefined) {
   const {
     data,
     fetchNextPage,
@@ -35,7 +36,7 @@ export function useS3Files(bucketName: string | null) {
         params.append('continuationToken', (pageParam as PaginationToken).continuationToken)
       }
       
-      const response = await fetch(`/api/s3/list-objects?bucket=${bucketName}&${params}`)
+      const response = await fetch(`/api/s3/list-objects?bucket=${bucketName}&${params}&profile=${activeProfile}`)
       if (!response.ok) {
         throw new Error('Failed to fetch objects')
       }

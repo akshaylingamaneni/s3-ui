@@ -13,13 +13,15 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
+import { useAWSStore } from '@/store/aws-store'
 
 export default function Page() {
   const { currentBucket } = useBucketStore()
+  const { activeProfile } = useAWSStore()
   const {
     files,
     isLoading,
-  } = useS3Files(currentBucket)
+  } = useS3Files(currentBucket, activeProfile?.profileName)
 
   return (
     <div className="flex flex-col gap-4">

@@ -9,6 +9,7 @@ export async function GET(request: NextRequest) {
   // Get query parameters
   const searchParams = request.nextUrl.searchParams
   const bucket = searchParams.get('bucket')
+  const profileName = searchParams.get('profile')
   const continuationToken = searchParams.get('continuationToken')
   
   if (!bucket) {
@@ -28,8 +29,9 @@ export async function GET(request: NextRequest) {
     }
     
     const profiles: AWSProfile[] | null = await redis.get(`aws_credentials:${user.id}`)
-    const profile = Array.isArray(profiles) ? profiles[0] : profiles
+    const profile = profiles?.find((p) => p.profileName === profileName)
     console.log("profile", profile)
+    console.log("profileName", profileName)
     // Validate AWS credentials
     if (!profile || !profile.accessKeyId || !profile.secretAccessKey) {
       return NextResponse.json(
@@ -47,6 +49,7 @@ export async function GET(request: NextRequest) {
       endpoint: profile.endpoint || '',
       forcePathStyle: profile.forcePathStyle || false,
     })
+    console.log("client", decryptedSecretAccessKey)
 
     // Set up the ListObjectsV2Command
     const command = new ListObjectsV2Command({
