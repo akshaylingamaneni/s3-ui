@@ -71,24 +71,40 @@ export function EmptyState({
 
       {/* Small Floating Icons Background Layer */}
       <div className="absolute inset-0 overflow-hidden opacity-[0.07]">
-        {[...Array(20)].map((_, i) => {
-          const icons = [CloudIcon, FileIcon, FolderIcon, DatabaseIcon];
-          const RandomIcon = icons[Math.floor(Math.random() * icons.length)];
-          
-          return (
-            <div
-              key={`icon-${i}`}
-              className="absolute"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                transform: `rotate(${Math.random() * 360}deg)`,
-              }}
-            >
-              <RandomIcon size={16} className="text-current" />
-            </div>
-          );
-        })}
+        {[
+          { icon: CloudIcon, x: 10, y: 20, rotate: 15 },
+          { icon: FileIcon, x: 25, y: 35, rotate: -10 },
+          { icon: FolderIcon, x: 40, y: 15, rotate: 25 },
+          { icon: DatabaseIcon, x: 55, y: 40, rotate: -15 },
+          { icon: CloudIcon, x: 70, y: 25, rotate: 20 },
+          { icon: FileIcon, x: 85, y: 45, rotate: -25 },
+          { icon: FolderIcon, x: 15, y: 60, rotate: 30 },
+          { icon: DatabaseIcon, x: 30, y: 75, rotate: -20 },
+          { icon: CloudIcon, x: 45, y: 55, rotate: 15 },
+          { icon: FileIcon, x: 60, y: 70, rotate: -30 },
+          { icon: FolderIcon, x: 75, y: 85, rotate: 25 },
+          { icon: DatabaseIcon, x: 90, y: 65, rotate: -15 },
+          { icon: CloudIcon, x: 20, y: 90, rotate: 20 },
+          { icon: FileIcon, x: 35, y: 80, rotate: -25 },
+          { icon: FolderIcon, x: 50, y: 95, rotate: 30 },
+          { icon: DatabaseIcon, x: 65, y: 85, rotate: -20 },
+          { icon: CloudIcon, x: 80, y: 75, rotate: 15 },
+          { icon: FileIcon, x: 95, y: 90, rotate: -30 },
+          { icon: FolderIcon, x: 5, y: 45, rotate: 25 },
+          { icon: DatabaseIcon, x: 82, y: 15, rotate: -15 },
+        ].map(({ icon: Icon, x, y, rotate }, i) => (
+          <div
+            key={`icon-${i}`}
+            className="absolute"
+            style={{
+              left: `${x}%`,
+              top: `${y}%`,
+              transform: `rotate(${rotate}deg)`,
+            }}
+          >
+            <Icon size={16} className="text-current" />
+          </div>
+        ))}
       </div>
 
       {/* Physics animation background */}

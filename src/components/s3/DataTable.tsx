@@ -68,7 +68,7 @@ export function DataTable<TData, TValue>({
   })
 
   return (
-    <div className="w-full flex flex-col bg-zinc-800/40 rounded-lg px-4 py-4">
+    <div className="w-full flex flex-col bg-white/50 dark:bg-zinc-800/40 rounded-lg px-4 py-4 border border-zinc-200 dark:border-zinc-800">
       <div className="rounded-md relative">
         <Table>
           <TableHeader>
@@ -93,7 +93,7 @@ export function DataTable<TData, TValue>({
                 <TableRow key={`loading-${index}`} className="animate-pulse">
                   {columns.map((column, colIndex) => (
                     <TableCell key={colIndex}>
-                      <div className="h-4 bg-neutral-700/50 rounded w-[80%]" />
+                      <div className="h-4 bg-zinc-200 dark:bg-neutral-700/50 rounded w-[80%]" />
                     </TableCell>
                   ))}
                 </TableRow>
@@ -102,7 +102,7 @@ export function DataTable<TData, TValue>({
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
-                  className="hover:bg-gray-100 dark:hover:bg-zinc-800 cursor-pointer transition-colors h-12"
+                  className="hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer transition-colors h-12"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
@@ -137,16 +137,16 @@ export function DataTable<TData, TValue>({
         )} */}
       </div>
       
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-2 py-4 bg-neutral-800/50 rounded-lg">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-2 py-4 bg-zinc-50 dark:bg-neutral-800/50 rounded-lg border border-zinc-200 dark:border-zinc-800">
         {/* Search - Full width on mobile, fixed width on desktop */}
         <div className="w-full sm:w-[300px]">
-          <div className="relative w-full bg-neutral-900 rounded-lg">
-            <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500 dark:text-zinc-400" />
+          <div className="relative w-full bg-white dark:bg-neutral-900 rounded-lg border border-zinc-200 dark:border-zinc-800">
+            <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400 dark:text-zinc-400" />
             <Input
               placeholder="Search files..."
               value={globalFilter ?? ""}
               onChange={(event) => setGlobalFilter(event.target.value)}
-              className="pl-8 h-8 w-full bg-transparent text-sm"
+              className="pl-8 h-8 w-full bg-transparent text-sm border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
             />
           </div>
         </div>
@@ -163,7 +163,7 @@ export function DataTable<TData, TValue>({
                 table.setPageSize(Number(value))
               }}
             >
-              <SelectTrigger className="h-8 w-[80px]">
+              <SelectTrigger className="h-8 w-[80px] border-zinc-200 dark:border-zinc-800">
                 <SelectValue placeholder={table.getState().pagination.pageSize} />
               </SelectTrigger>
               <SelectContent side="top">
@@ -182,7 +182,7 @@ export function DataTable<TData, TValue>({
               <Button
                 variant="outline"
                 size="icon"
-                className="h-8 w-8"
+                className="h-8 w-8 border-zinc-200 dark:border-zinc-800"
                 onClick={() => table.setPageIndex(0)}
                 disabled={!table.getCanPreviousPage()}
               >
@@ -192,7 +192,7 @@ export function DataTable<TData, TValue>({
               <Button
                 variant="outline"
                 size="icon"
-                className="h-8 w-8"
+                className="h-8 w-8 border-zinc-200 dark:border-zinc-800"
                 onClick={() => table.previousPage()}
                 disabled={!table.getCanPreviousPage()}
               >
@@ -214,7 +214,7 @@ export function DataTable<TData, TValue>({
               <Button
                 variant="outline"
                 size="icon"
-                className="h-8 w-8"
+                className="h-8 w-8 border-zinc-200 dark:border-zinc-800"
                 onClick={() => table.nextPage()}
                 disabled={!table.getCanNextPage()}
               >
@@ -224,7 +224,7 @@ export function DataTable<TData, TValue>({
               <Button
                 variant="outline"
                 size="icon"
-                className="h-8 w-8"
+                className="h-8 w-8 border-zinc-200 dark:border-zinc-800"
                 onClick={() => table.setPageIndex(table.getPageCount() - 1)}
                 disabled={!table.getCanNextPage()}
               >
