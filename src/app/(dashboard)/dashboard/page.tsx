@@ -14,12 +14,13 @@ export default function Page() {
 
   return (
     <div className="flex flex-col gap-4">
+      {/* todo: need to figure out what dashboard should look like */}
       {/* First item: Flex row with 3 items */}
-      <div className="flex flex-row justify-around flex-none">
+      {/* <div className="flex flex-row justify-around flex-none">
         <div className="p-4 bg-zinc-800/40 aspect-video rounded-lg">Item 1</div>
         <div className="p-4 bg-zinc-800/40 aspect-video rounded-lg">Item 2</div>
         <div className="p-4 bg-zinc-800/40 aspect-video rounded-lg">Item 3</div>
-      </div>
+      </div> */}
 
       {/* Second item: DataTable */}
       <div className="flex-1 mx-4">
