@@ -11,6 +11,7 @@ export default function DashboardLayout({
   children: React.ReactNode
 }) {
   return (
+    <div className="flex flex-col h-full">
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
@@ -36,10 +37,11 @@ export default function DashboardLayout({
             </Breadcrumb>
           </div>
         </header>
-        <body className={GeistSans.className}>
-          {children}
-        </body>
+        <div className="">
+            {children}
+          </div>
       </SidebarInset>
     </SidebarProvider>
+    </div>
   )
 } 

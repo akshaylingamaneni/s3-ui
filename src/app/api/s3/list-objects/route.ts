@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { S3Client, ListObjectsV2Command } from "@aws-sdk/client-s3"
-import { createS3Client } from '@/lib/aws/s3-client'
+import { AWSProfile, createS3Client } from '@/lib/aws/s3-client'
+import { currentUser } from '@clerk/nextjs/server'
+import redis from '@/lib/redis'
+import { decrypt } from '@/lib/encryption'
 
 export async function GET(request: NextRequest) {
   // Get query parameters
@@ -16,12 +19,33 @@ export async function GET(request: NextRequest) {
   }
 
   try {
+    const user = await currentUser()
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
+    
+    const profiles: AWSProfile[] | null = await redis.get(`aws_credentials:${user.id}`)
+    const profile = Array.isArray(profiles) ? profiles[0] : profiles
+    console.log("profile", profile)
+    // Validate AWS credentials
+    if (!profile || !profile.accessKeyId || !profile.secretAccessKey) {
+      return NextResponse.json(
+        { error: 'Invalid or missing AWS credentials' },
+        { status: 402 }
+      )
+    }
+    const decryptedSecretAccessKey = await decrypt(profile.secretAccessKey)
     // Create S3 client
     const client = createS3Client({
-      region: process.env.AWS_REGION || 'us-east-1',
-      profileName: process.env.AWS_PROFILE_NAME || 'default',
-      accessKeyId: process.env.AWS_ACCESS_KEY_ID || '',
-      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || '',
+      accessKeyId: profile.accessKeyId,
+      secretAccessKey: decryptedSecretAccessKey,
+      region: profile.region || 'us-east-1',
+      profileName: profile.profileName || '',
+      endpoint: profile.endpoint || '',
+      forcePathStyle: profile.forcePathStyle || false,
     })
 
     // Set up the ListObjectsV2Command
@@ -31,6 +55,7 @@ export async function GET(request: NextRequest) {
       ContinuationToken: continuationToken || undefined,
       Delimiter: '/' // Use delimiter to handle folders
     })
+    console.log("command", command)
 
     // Execute the command
     const response = await client.send(command)
@@ -63,7 +88,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Error listing S3 objects:', error)
     return NextResponse.json(
-      { error: 'Failed to list objects' },
+      { error: 'Failed to list objects', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     )
   }
