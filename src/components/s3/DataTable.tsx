@@ -31,22 +31,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react"
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Loader2 } from "lucide-react"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  isLoading?: boolean
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  isLoading = false,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [globalFilter, setGlobalFilter] = useState("")
 
   const table = useReactTable({
-    data,
+    data: isLoading ? [] : data,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -67,28 +69,36 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="w-full flex flex-col bg-zinc-800/40 rounded-lg px-4 py-4">
-      <div className="rounded-md">
+      <div className="rounded-md relative">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  )
-                })}
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                  </TableHead>
+                ))}
               </TableRow>
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {isLoading ? (
+              Array.from({ length: 10 }).map((_, index) => (
+                <TableRow key={`loading-${index}`} className="animate-pulse">
+                  {columns.map((column, colIndex) => (
+                    <TableCell key={colIndex}>
+                      <div className="h-4 bg-neutral-700/50 rounded w-[80%]" />
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
@@ -116,6 +126,15 @@ export function DataTable<TData, TValue>({
             )}
           </TableBody>
         </Table>
+        {/* todo: decide if we want to show a loading state or the existing loading state is good enough */}
+        {/* {isLoading && (
+          <div className="absolute inset-0 bg-zinc-900/20 backdrop-blur-sm rounded-md flex items-center justify-center">
+            <div className="flex items-center gap-2">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span className="text-sm text-zinc-400">Loading files...</span>
+            </div>
+          </div>
+        )} */}
       </div>
       
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-2 py-4 bg-neutral-800/50 rounded-lg">
