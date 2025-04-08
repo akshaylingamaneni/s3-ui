@@ -6,7 +6,10 @@ import {
   getCoreRowModel,
   getPaginationRowModel,
   useReactTable,
+  getSortedRowModel,
+  SortingState,
 } from "@tanstack/react-table"
+import { useState } from "react"
 
 import {
   Table,
@@ -35,11 +38,18 @@ export function DataTable<TData, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
+  const [sorting, setSorting] = useState<SortingState>([])
+
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    onSortingChange: setSorting,
+    state: {
+      sorting,
+    },
     initialState: {
       pagination: {
         pageSize: 20,
@@ -48,7 +58,7 @@ export function DataTable<TData, TValue>({
   })
 
   return (
-    <div className="w-full flex flex-col bg-white/50 dark:bg-zinc-800/40 rounded-lg px-4 py-4">
+    <div className="w-full flex flex-col bg-white/50 dark:bg-zinc-800/40 rounded-lg px-4 py-4 mb-4 mt-4">
       <div className="rounded-md">
         <Table>
           <TableHeader>
