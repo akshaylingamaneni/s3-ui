@@ -5,6 +5,7 @@ import { useBucketStore } from '@/store/bucketStore'
 import { useAWSStore } from '@/store/aws-store'
 import { Skeleton } from "@/components/ui/skeleton"
 import { useEffect, useState } from "react"
+import { Cylinder, HomeIcon, UserIcon } from "lucide-react"
 
 export function BucketBreadcrumb() {
   const { currentBucket } = useBucketStore()
@@ -44,12 +45,14 @@ export function BucketBreadcrumb() {
     <Breadcrumb>
       <BreadcrumbList>
         <BreadcrumbItem>
+          <UserIcon className="w-4 h-4" />
           <BreadcrumbLink href="/dashboard" className="text-sm">
             {activeProfile ? activeProfile.profileName : 'Select Profile'}
           </BreadcrumbLink>
         </BreadcrumbItem>
         <BreadcrumbSeparator />
         <BreadcrumbItem>
+          <HomeIcon className="w-4 h-4" />
           <BreadcrumbLink href="/dashboard" className="text-sm">
             Buckets
           </BreadcrumbLink>
@@ -57,12 +60,14 @@ export function BucketBreadcrumb() {
         <BreadcrumbSeparator />
         {currentBucket ? (
           <BreadcrumbItem>
+          <Cylinder className="w-4 h-4" />
             <BreadcrumbPage className="text-sm">
               {currentBucket}
             </BreadcrumbPage>
           </BreadcrumbItem>
         ) : (
           <BreadcrumbItem>
+            <Cylinder className="w-4 h-4" />
             <BreadcrumbPage className="text-sm text-muted-foreground">
               Select a bucket
             </BreadcrumbPage>
