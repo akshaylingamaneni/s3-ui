@@ -9,6 +9,7 @@ import { DataTableColumnHeader } from "./ColumnHeader"
 export const columns: ColumnDef<S3File>[] = [
   {
     accessorKey: "name",
+    enableHiding: false,
     header: ({ column }) => (
       <div className="flex items-center">
         <DataTableColumnHeader column={column} title="Name" />

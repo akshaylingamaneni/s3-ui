@@ -5,11 +5,15 @@ import {
   flexRender,
   getCoreRowModel,
   getPaginationRowModel,
-  useReactTable,
   getSortedRowModel,
+  getFilteredRowModel,
+  useReactTable,
   SortingState,
 } from "@tanstack/react-table"
 import { useState } from "react"
+import { Input } from "@/components/ui/input"
+import { ViewOptions } from "./ViewOptions"
+import { Search } from "lucide-react"
 
 import {
   Table,
@@ -39,6 +43,7 @@ export function DataTable<TData, TValue>({
   data,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
+  const [globalFilter, setGlobalFilter] = useState("")
 
   const table = useReactTable({
     data,
@@ -46,9 +51,12 @@ export function DataTable<TData, TValue>({
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
     onSortingChange: setSorting,
+    onGlobalFilterChange: setGlobalFilter,
     state: {
       sorting,
+      globalFilter,
     },
     initialState: {
       pagination: {
@@ -58,7 +66,7 @@ export function DataTable<TData, TValue>({
   })
 
   return (
-    <div className="w-full flex flex-col bg-white/50 dark:bg-zinc-800/40 rounded-lg px-4 py-4 mb-4 mt-4">
+    <div className="w-full flex flex-col bg-zinc-800/40 rounded-lg px-4 py-4">
       <div className="rounded-md">
         <Table>
           <TableHeader>
@@ -110,9 +118,22 @@ export function DataTable<TData, TValue>({
         </Table>
       </div>
       
-      <div className="flex items-center justify-between px-2 py-4">
+      <div className="flex items-center justify-between px-2 py-4 bg-neutral-800/50 rounded-lg">
+        <div className="flex items-center space-x-2 w-[300px] bg-neutral-900 rounded-lg">
+          <div className="relative">
+            <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500 dark:text-zinc-400" />
+            <Input
+              placeholder="Search files..."
+              value={globalFilter ?? ""}
+              onChange={(event) => setGlobalFilter(event.target.value)}
+              className="pl-8 h-8 w-[300px] bg-transparent text-sm"
+            />
+          </div>
+        </div>
+
         <div className="flex items-center space-x-6 lg:space-x-8">
           <div className="flex items-center space-x-2">
+            <ViewOptions table={table} />
             <p className="text-sm text-gray-600 dark:text-zinc-400">Rows per page</p>
             <Select
               value={`${table.getState().pagination.pageSize}`}
@@ -132,7 +153,7 @@ export function DataTable<TData, TValue>({
               </SelectContent>
             </Select>
           </div>
-          
+
           <div className="flex items-center space-x-2">
             <Button
               variant="outline"
@@ -186,6 +207,9 @@ export function DataTable<TData, TValue>({
               <span className="sr-only">Go to last page</span>
               <ChevronsRight className="h-4 w-4" />
             </Button>
+            <p className="text-sm text-gray-600 dark:text-zinc-400">
+              {table.getFilteredRowModel().rows.length} items
+            </p>
           </div>
         </div>
       </div>
