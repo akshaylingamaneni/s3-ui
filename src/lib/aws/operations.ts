@@ -6,7 +6,7 @@ import {
   S3Client
 } from "@aws-sdk/client-s3";
 import { BucketConnection, S3File } from "@/types/bucket";
-import { createS3Client } from "./s3-client";
+import { getS3Client } from "./s3-client";
 
 interface BucketConnectionMethod {
   type: 'iam_user' | 'sts' | 'sso';
@@ -77,20 +77,30 @@ const setupSteps: SetupGuideStep[] = [
 ];
 
 export class S3Operations {
-  private client: S3Client;
+  private client: S3Client | null = null;
   private bucket: string;
 
   constructor(connection: BucketConnection) {
-    this.client = createS3Client({
+    this.bucket = connection.bucket;
+  }
+
+  async initialize(): Promise<void> {
+    this.client = await getS3Client({
       region: process.env.AWS_REGION || 'us-east-1',
       profileName: process.env.AWS_PROFILE_NAME || 'default',
       accessKeyId: process.env.AWS_ACCESS_KEY_ID || '',
       secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || '',
     });
-    this.bucket = connection.bucket;
+  }
+
+  private ensureInitialized(): void {
+    if (!this.client) {
+      throw new Error("S3Operations not initialized. Call initialize() before using this instance.");
+    }
   }
 
   async listFiles(prefix: string = ""): Promise<S3File[]> {
+    this.ensureInitialized();
     try {
       const command = new ListObjectsV2Command({
         Bucket: this.bucket,
@@ -98,7 +108,7 @@ export class S3Operations {
         Delimiter: "/",
       });
 
-      const response = await this.client.send(command);
+      const response = await this.client!.send(command);
       const files: S3File[] = [];
 
       // Handle directories (CommonPrefixes)
@@ -134,6 +144,7 @@ export class S3Operations {
   }
 
   async uploadFile(key: string, file: File): Promise<void> {
+    this.ensureInitialized();
     try {
       const command = new PutObjectCommand({
         Bucket: this.bucket,
@@ -142,7 +153,7 @@ export class S3Operations {
         ContentType: file.type,
       });
 
-      await this.client.send(command);
+      await this.client!.send(command);
     } catch (error) {
       console.error("Error uploading file:", error);
       throw error;
@@ -150,13 +161,14 @@ export class S3Operations {
   }
 
   async downloadFile(key: string): Promise<Blob> {
+    this.ensureInitialized();
     try {
       const command = new GetObjectCommand({
         Bucket: this.bucket,
         Key: key,
       });
 
-      const response = await this.client.send(command);
+      const response = await this.client!.send(command);
       if (!response.Body) {
         throw new Error("Empty response body");
       }
@@ -169,13 +181,14 @@ export class S3Operations {
   }
 
   async deleteFile(key: string): Promise<void> {
+    this.ensureInitialized();
     try {
       const command = new DeleteObjectCommand({
         Bucket: this.bucket,
         Key: key,
       });
 
-      await this.client.send(command);
+      await this.client!.send(command);
     } catch (error) {
       console.error("Error deleting file:", error);
       throw error;

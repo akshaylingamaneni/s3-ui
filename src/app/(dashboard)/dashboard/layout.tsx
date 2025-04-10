@@ -1,9 +1,8 @@
 import { AppSidebar } from "@/components/layout/sidebar/app-sidebar"
 import { Separator } from "@/components/ui/separator"
-import { Breadcrumb, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbItem, BreadcrumbList, BreadcrumbPage } from "@/components/ui/breadcrumb"
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
-import { UserButton } from "@clerk/nextjs"
-import { GeistSans } from "geist/font/sans"
+import { BucketBreadcrumb } from "@/components/layout/BucketBreadcrumb"
+import { SignOutButton } from "@clerk/nextjs"
 
 export default function DashboardLayout({
   children
@@ -11,6 +10,7 @@ export default function DashboardLayout({
   children: React.ReactNode
 }) {
   return (
+    <div className="flex flex-col h-full">
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
@@ -21,25 +21,15 @@ export default function DashboardLayout({
               orientation="vertical"
               className="mr-2 data-[orientation=vertical]:h-4"
             />
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="#">
-                    Building Your Application
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Data Fetching</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
+            <BucketBreadcrumb />
           </div>
         </header>
-        <body className={GeistSans.className}>
+        {/* <SignOutButton /> */}
+        <div className="">
           {children}
-        </body>
+        </div>
       </SidebarInset>
     </SidebarProvider>
+    </div>
   )
 } 

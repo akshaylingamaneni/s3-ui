@@ -244,6 +244,9 @@ export function AwsSettings() {
                             className="dark:bg-zinc-800 dark:hover:bg-zinc-700/50 dark:text-zinc-200"
                             onClick={() => {
                                 setSelectedProfile(null)
+                                setIsSuccess(false)
+                                setError(null)
+                                setIsValidating(false)
                                 form.reset({
                                     profileName: "",
                                     accessKeyId: "",
@@ -291,7 +294,7 @@ export function AwsSettings() {
                     )}
                 </div>
 
-                {(selectedProfile || profiles.length === 0) && (
+                {(profiles.length === 0 || selectedProfile === null) && (
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                             <FormField
@@ -445,10 +448,158 @@ export function AwsSettings() {
                     </Form>
                 )}
 
-                {!selectedProfile && profiles.length > 0 && (
-                    <div className="text-center text-muted-foreground dark:text-zinc-400">
-                        <p>Select an existing profile to edit or create a new one.</p>
-                    </div>
+                {selectedProfile && (
+                    <Form {...form}>
+                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                            <FormField
+                                control={form.control}
+                                name="profileName"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="dark:text-zinc-200">Profile Name</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                {...field}
+                                                placeholder="Enter a profile name"
+                                                className="dark:bg-zinc-800 dark:text-zinc-200 dark:border-zinc-600 dark:placeholder:text-zinc-400"
+                                            />
+                                        </FormControl>
+                                        <FormMessage className="dark:text-red-400" />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="accessKeyId"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="dark:text-zinc-200">Access Key ID</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                {...field}
+                                                placeholder="Enter your AWS Access Key ID"
+                                                className="dark:bg-zinc-800 dark:text-zinc-200 dark:border-zinc-600 dark:placeholder:text-zinc-400"
+                                            />
+                                        </FormControl>
+                                        <FormMessage className="dark:text-red-400" />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="secretAccessKey"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="dark:text-zinc-200">Secret Access Key</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                {...field}
+                                                type="password"
+                                                placeholder="Enter your AWS Secret Access Key"
+                                                className="dark:bg-zinc-800 dark:text-zinc-200 dark:border-zinc-600 dark:placeholder:text-zinc-400"
+                                            />
+                                        </FormControl>
+                                        <FormMessage className="dark:text-red-400" />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="endpoint"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="dark:text-zinc-200">
+                                            Custom Endpoint (Optional)
+                                        </FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                {...field}
+                                                placeholder="https://your-s3-endpoint.com"
+                                                className="dark:bg-zinc-800 dark:text-zinc-200 dark:border-zinc-600 dark:placeholder:text-zinc-400"
+                                            />
+                                        </FormControl>
+                                        <FormMessage className="dark:text-red-400" />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="region"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="dark:text-zinc-200">Region</FormLabel>
+                                        <Select 
+                                            onValueChange={field.onChange} 
+                                            defaultValue={field.value}
+                                        >
+                                            <SelectTrigger className="dark:bg-zinc-800 dark:text-zinc-200 dark:border-zinc-600">
+                                                <SelectValue placeholder="Select a region" />
+                                            </SelectTrigger>
+                                            <SelectContent className="dark:bg-zinc-800 dark:border-zinc-600">
+                                                <SelectItem value="us-east-1">US East (N. Virginia)</SelectItem>
+                                                <SelectItem value="us-west-2">US West (Oregon)</SelectItem>
+                                                {/* Add more regions as needed */}
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage className="dark:text-red-400" />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="forcePathStyle"
+                                render={({ field }) => (
+                                    <FormItem className="flex items-center gap-2">
+                                        <FormControl>
+                                            <input
+                                                type="checkbox"
+                                                checked={field.value}
+                                                onChange={field.onChange}
+                                            />
+                                        </FormControl>
+                                        <FormLabel className="dark:text-zinc-200">
+                                            Force Path Style
+                                        </FormLabel>
+                                        <FormMessage className="dark:text-red-400" />
+                                    </FormItem>
+                                )}
+                            />
+
+                            {error && (
+                                <p className="text-sm text-destructive dark:text-red-400">
+                                    {error}
+                                </p>
+                            )}
+
+                            {isSuccess && (
+                                <div className="flex flex-col gap-4">
+                                    <p className="text-sm text-green-500 dark:text-green-400">
+                                        AWS credentials have been validated and saved successfully.
+                                    </p>
+                                    <Button
+                                        onClick={() => handleImportBuckets(form.getValues("profileName"))}
+                                        className="w-full flex items-center gap-2 dark:bg-zinc-200 dark:text-zinc-800 cursor-pointer"
+                                    >
+                                        <Download className="h-4 w-4" />
+                                        Sync Buckets
+                                    </Button>
+                                </div>
+                            )}
+
+                            <Button
+                                type="submit"
+                                disabled={isValidating}
+                                className="w-full dark:bg-zinc-200 dark:text-zinc-800 cursor-pointer"
+                            >
+                                {isValidating ? "Validating..." : selectedProfile ? "Update Profile" : "Create Profile"}
+                            </Button>
+                        </form>
+                    </Form>
                 )}
             </CardContent>
         </Card>

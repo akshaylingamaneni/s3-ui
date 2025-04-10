@@ -61,3 +61,9 @@
 ### 04/05/25
 ## Things to do 
 - [x] when profile is deleted clean up all the buckets
+
+### 04/08/25
+## TODO:
+- [ ] clean up and optimize the s3 client calls
+- [ ] optimized loading states like the brief transition before showing content
+- [ ] we have the base listing flow, start working on folder traversal and file download
