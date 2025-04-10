@@ -2,11 +2,14 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 import { S3File } from "@/hooks/useS3Files"
-import { FileIcon, FolderIcon } from "lucide-react"
+import { FileIcon, FolderIcon, MoreHorizontal } from "lucide-react"
 import { formatSize, formatDate } from "@/lib/utils" // We'll move the format functions to utils
 import { DataTableColumnHeader } from "./ColumnHeader"
+import { Button } from "@/components/ui/button"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { FileEdit, Download, Copy, Trash, Link, Move } from "lucide-react"
 
-export const columns: ColumnDef<S3File>[] = [
+export const columns = (handleFileAction: (action: string, item: any) => void): ColumnDef<S3File>[] => [
   {
     accessorKey: "name",
     enableHiding: false,
@@ -70,6 +73,109 @@ export const columns: ColumnDef<S3File>[] = [
       const dateA = new Date(rowA.original.lastModified).getTime()
       const dateB = new Date(rowB.original.lastModified).getTime()
       return dateA - dateB
+    },
+  },
+  {
+    id: "actions",
+    enableHiding: false,
+    header: ({ column }) => (
+      <div className="flex justify-end hidden sm:flex">
+        <DataTableColumnHeader column={column} title="Action" />
+      </div>
+    ),
+    cell: ({ row }) => {
+      return (
+        <div 
+          className="text-right pr-4"
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+          }}
+        >
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button 
+                variant="ghost" 
+                className="h-8 w-8 p-0"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                }}
+              >
+                <span className="sr-only">Open menu</span>
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent 
+              align="end"
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+              }}
+            >
+              {row.original.isDirectory ? (
+                // Folder options
+                <>
+                  <DropdownMenuItem onClick={(e) => {
+                    e.stopPropagation();
+                    handleFileAction('rename', row.original);
+                  }}>
+                    <FileEdit className="mr-2 h-4 w-4" />
+                    <span>Rename</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleFileAction('download', row.original)}>
+                    <Download className="mr-2 h-4 w-4" />
+                    <span>Download</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleFileAction('copy-path', row.original)}>
+                    <Copy className="mr-2 h-4 w-4" />
+                    <span>Copy path to folder</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem 
+                    onClick={() => handleFileAction('delete', row.original)}
+                    className="text-red-600 dark:text-red-400"
+                  >
+                    <Trash className="mr-2 h-4 w-4" />
+                    <span>Delete</span>
+                  </DropdownMenuItem>
+                </>
+              ) : (
+                // File options
+                <>
+                  <DropdownMenuItem onClick={() => handleFileAction('get-url', row.original)}>
+                    <Link className="mr-2 h-4 w-4" />
+                    <span>Get URL</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={(e) => {
+                    e.stopPropagation();
+                    handleFileAction('rename', row.original);
+                  }}>
+                    <FileEdit className="mr-2 h-4 w-4" />
+                    <span>Rename</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleFileAction('move', row.original)}>
+                    <Move className="mr-2 h-4 w-4" />
+                    <span>Move</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleFileAction('download', row.original)}>
+                    <Download className="mr-2 h-4 w-4" />
+                    <span>Download</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem 
+                    onClick={() => handleFileAction('delete', row.original)}
+                    className="text-red-600 dark:text-red-400"
+                  >
+                    <Trash className="mr-2 h-4 w-4" />
+                    <span>Delete</span>
+                  </DropdownMenuItem>
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      )
     },
   },
 ] 

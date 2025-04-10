@@ -2,6 +2,7 @@ import { AppSidebar } from "@/components/layout/sidebar/app-sidebar"
 import { Separator } from "@/components/ui/separator"
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
 import { BucketBreadcrumb } from "@/components/layout/BucketBreadcrumb"
+import { SignOutButton } from "@clerk/nextjs"
 
 export default function DashboardLayout({
   children
@@ -23,6 +24,7 @@ export default function DashboardLayout({
             <BucketBreadcrumb />
           </div>
         </header>
+        {/* <SignOutButton /> */}
         <div className="">
           {children}
         </div>

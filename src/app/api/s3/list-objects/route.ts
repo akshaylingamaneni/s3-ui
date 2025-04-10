@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { S3Client, ListObjectsV2Command } from "@aws-sdk/client-s3"
-import { AWSProfile, createS3Client } from '@/lib/aws/s3-client'
+import { AWSProfile, getS3Client } from '@/lib/aws/s3-client'
 import { currentUser } from '@clerk/nextjs/server'
 import redis from '@/lib/redis'
 import { decrypt } from '@/lib/encryption'
@@ -11,10 +11,18 @@ export async function GET(request: NextRequest) {
   const bucket = searchParams.get('bucket')
   const profileName = searchParams.get('profile')
   const continuationToken = searchParams.get('continuationToken')
+  const prefix = searchParams.get('prefix') || ''
   
   if (!bucket) {
     return NextResponse.json(
       { error: 'Bucket name is required' }, 
+      { status: 400 }
+    )
+  }
+
+  if (!profileName) {
+    return NextResponse.json(
+      { error: 'Profile name is required' }, 
       { status: 400 }
     )
   }
@@ -30,18 +38,16 @@ export async function GET(request: NextRequest) {
     
     const profiles: AWSProfile[] | null = await redis.get(`aws_credentials:${user.id}`)
     const profile = profiles?.find((p) => p.profileName === profileName)
-    console.log("profile", profile)
-    console.log("profileName", profileName)
-    // Validate AWS credentials
+    
     if (!profile || !profile.accessKeyId || !profile.secretAccessKey) {
       return NextResponse.json(
         { error: 'Invalid or missing AWS credentials' },
         { status: 402 }
       )
     }
+
     const decryptedSecretAccessKey = await decrypt(profile.secretAccessKey)
-    // Create S3 client
-    const client = createS3Client({
+    const client = await getS3Client({
       accessKeyId: profile.accessKeyId,
       secretAccessKey: decryptedSecretAccessKey,
       region: profile.region || 'us-east-1',
@@ -49,20 +55,18 @@ export async function GET(request: NextRequest) {
       endpoint: profile.endpoint || '',
       forcePathStyle: profile.forcePathStyle || false,
     })
-    console.log("client", decryptedSecretAccessKey)
-
-    // Set up the ListObjectsV2Command
+    console.log('prefix in route', prefix)
     const command = new ListObjectsV2Command({
       Bucket: bucket,
       MaxKeys: 100,
       ContinuationToken: continuationToken || undefined,
-      Delimiter: '/' // Use delimiter to handle folders
+      Prefix: prefix || '',
+      Delimiter: '/'
     })
-    console.log("command", command)
+    console.log('command', command)
 
-    // Execute the command
     const response = await client.send(command)
-    
+    console.log('response   dddss', response)
     // Process directories
     const directories = (response.CommonPrefixes || []).map((prefix) => ({
       name: prefix.Prefix?.split('/').filter(Boolean).pop() || '',
@@ -71,7 +75,7 @@ export async function GET(request: NextRequest) {
       key: prefix.Prefix || '',
       isDirectory: true,
     }))
-    
+    console.log('directories', directories)
     // Process files
     const files = (response.Contents || []).map((item) => ({
       name: item.Key?.split('/').pop() || '',
@@ -80,6 +84,7 @@ export async function GET(request: NextRequest) {
       key: item.Key || '',
       isDirectory: false,
     }))
+    console.log('files', files)
     
     // Return formatted response
     return NextResponse.json({
