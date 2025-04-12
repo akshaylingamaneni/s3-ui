@@ -18,6 +18,10 @@ import { S3File } from '@/hooks/useS3Files'
 import { useCallback } from 'react'
 import React from 'react'
 import { toast } from 'sonner'
+import { useState } from 'react'
+import { Button } from "@/components/ui/button"
+import { CurlCommandsDialog } from '@/components/s3/CurlCommandsDialog'
+
 export default function Page() {
   const { currentBucket, currentPath, setCurrentPath } = useBucketStore()
   const { activeProfile } = useAWSStore()
@@ -26,17 +30,19 @@ export default function Page() {
     isLoading,
   } = useS3Files(currentBucket, activeProfile?.profileName, currentPath || '')
 
+  const [curlCommands, setCurlCommands] = useState<string[]>([])
+  const [showCurlDialog, setShowCurlDialog] = useState(false)
+  const [dialogTitle, setDialogTitle] = useState("")
+
   const handleObjectClick = (file: S3File) => {
     if (file.isDirectory) {
       setTimeout(() => {
         setCurrentPath(file.key);
       }, 50);
     }
-    console.log('file', file);
   }
 
   const handleFileAction = async (action: string, item: any) => {
-    console.log('handleFileAction', action, item);
     if (action === 'download') {
       try {
         const response = await fetch('/api/s3/get-download-url', {
@@ -60,33 +66,42 @@ export default function Page() {
         
         // For a single file
         if (data.url) {
-          // Directly open the URL in a new tab to download
-          window.open(data.url, '_blank');
-          toast.success(`Downloading ${item.name}`);
+          const filename = item.key.split('/').pop();
+          const curlCommand = `curl -o "${filename}" "${data.url}"`;
+          
+          setCurlCommands([curlCommand]);
+          setDialogTitle(`Download ${filename}`);
+          setShowCurlDialog(true);
         }
         
         // For a directory
         if (data.urls && data.urls.length > 0) {
-          // Use browser's download capabilities for multiple files
-          // Due to browser limitations, we offer the user to download each file
-          toast.success(`Found ${data.urls.length} files. Starting downloads...`);
-          
-          // Download files one by one with a small delay to prevent browser blocking
-          data.urls.forEach((fileData: any, index: number) => {
-            setTimeout(() => {
-              const a = document.createElement('a');
-              a.href = fileData.url;
-              a.download = fileData.name;
-              a.target = '_blank';
-              document.body.appendChild(a);
-              a.click();
-              document.body.removeChild(a);
-            }, index * 300); // 300ms delay between downloads
+          // Generate individual curl commands (keep these as reference)
+          const individualCommands = data.urls.map((fileData: any) => {
+            const filename = fileData.name;
+            return `curl -o "${filename}" "${fileData.url}"`;
           });
+          
+          // Generate a single curl command with multiple -O flags
+          const urlsOnly = data.urls.map((fileData: any) => `"${fileData.url}"`).join(" -O ");
+          const multipleUrlCommand = `curl -O ${urlsOnly}`;
+          
+          // Generate parallel curl command
+          const parallelCommand = `curl --parallel -O ${urlsOnly}`;
+          
+          // Set all commands to be displayed
+          setCurlCommands([
+            parallelCommand,    // First option: parallel downloads
+            multipleUrlCommand, // Second option: sequential in one command
+            ...individualCommands // Still keep individual commands
+          ]);
+          
+          setDialogTitle(`Download ${data.urls.length} files`);
+          setShowCurlDialog(true);
         }
       } catch (error) {
         console.error('Download error:', error);
-        toast.error('Failed to download');
+        toast.error('Failed to generate download commands');
       }
     }
   }
@@ -111,6 +126,25 @@ export default function Page() {
     setTimeout(() => {
       setCurrentPath('');
     }, 50);
+  };
+
+  const generateDownloadScript = (commands: string[]) => {
+    const scriptLines = [
+      '#!/bin/bash',
+      '# Download script for multiple files',
+      'echo "Starting download of ' + commands.length + ' files..."',
+      ''
+    ];
+    
+    // Add all curl commands
+    commands.forEach(cmd => {
+      scriptLines.push(cmd);
+    });
+    
+    scriptLines.push('');
+    scriptLines.push('echo "All downloads completed!"');
+    
+    return scriptLines.join('\n');
   };
 
   return (
@@ -172,6 +206,14 @@ export default function Page() {
           />
         )}
       </div>
+
+      {/* Dialog for curl commands */}
+      <CurlCommandsDialog
+        isOpen={showCurlDialog}
+        onOpenChange={setShowCurlDialog}
+        title={dialogTitle}
+        commands={curlCommands}
+      />
     </div>
   )
 }

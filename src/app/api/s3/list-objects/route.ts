@@ -46,10 +46,9 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    const decryptedSecretAccessKey = await decrypt(profile.secretAccessKey)
     const client = await getS3Client({
       accessKeyId: profile.accessKeyId,
-      secretAccessKey: decryptedSecretAccessKey,
+      secretAccessKey: profile.secretAccessKey,
       region: profile.region || 'us-east-1',
       profileName: profile.profileName || '',
       endpoint: profile.endpoint || '',

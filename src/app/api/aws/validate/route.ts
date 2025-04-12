@@ -13,12 +13,6 @@ export async function POST(request: Request) {
       forcePathStyle,
       isEncrypted = false  // Add flag to know if key needs decryption
     } = await request.json();
-    console.log("accessKeyId", accessKeyId);
-    console.log("secretAccessKey", secretAccessKey);
-    console.log("endpoint", endpoint);
-    console.log("region", region);
-    console.log("forcePathStyle", forcePathStyle);
-    console.log("isEncrypted", isEncrypted);
     const client = await getS3Client({
       accessKeyId,
       secretAccessKey,

@@ -21,11 +21,9 @@ export async function POST(req: Request) {
             return NextResponse.json({ success: false, error: "Profile not found" }, { status: 404 })
         }
 
-        const secretAccessKey = await decrypt(profile.secretAccessKey)
 
         const client = await getS3Client({
             ...profile,
-            secretAccessKey
         })
 
         // Get all buckets
