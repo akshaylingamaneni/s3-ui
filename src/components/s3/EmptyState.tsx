@@ -16,6 +16,7 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Gravity, { MatterBody } from "@/components/ui/gravity"
+import { useState, useEffect } from "react"
 
 interface EmptyStateProps {
   title?: string
@@ -32,6 +33,17 @@ export function EmptyState({
   actionLabel,
   variant = "bucket"
 }: EmptyStateProps) {
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  useEffect(() => {
+    // Shorter delay to start animation
+    const timer = setTimeout(() => {
+      setIsAnimating(true);
+    }, 50);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <div className="flex flex-col items-center justify-center h-[500px] bg-zinc-50/50 dark:bg-neutral-800/40 rounded-lg overflow-hidden relative border border-zinc-200 dark:border-neutral-800">
       {/* Background Pattern */}
@@ -69,7 +81,7 @@ export function EmptyState({
         )}
       </div>
 
-      {/* Small Floating Icons Background Layer */}
+      {/* Small Floating Icons */}
       <div className="absolute inset-0 overflow-hidden opacity-[0.07]">
         {[
           { icon: CloudIcon, x: 10, y: 20, rotate: 15 },
@@ -110,7 +122,7 @@ export function EmptyState({
       {/* Physics animation background */}
       <Gravity 
         gravity={{ x: 0, y: 0.3 }} 
-        className="absolute inset-0"
+        className={`absolute inset-0 transition-opacity duration-500 ${isAnimating ? 'opacity-100' : 'opacity-0'}`}
         debug={false}
       >
         {variant === "bucket" ? (
