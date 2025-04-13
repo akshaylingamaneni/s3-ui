@@ -1,8 +1,7 @@
 "use client"
 
-import { useS3Files } from '@/hooks/useS3Files'
-import { useBucketStore } from '@/store/bucketStore'
 import { columns } from '@/components/s3/columns'
+import { CurlCommandsDialog } from '@/components/s3/CurlCommandsDialog'
 import { DataTable } from '@/components/s3/DataTable'
 import { EmptyState } from '@/components/s3/EmptyState'
 import {
@@ -13,14 +12,11 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
+import { S3File, useS3Files } from '@/hooks/useS3Files'
 import { useAWSProfileStore } from '@/store/aws-store'
-import { S3File } from '@/hooks/useS3Files'
-import { useCallback } from 'react'
-import React from 'react'
+import { useBucketStore } from '@/store/bucketStore'
+import React, { useState } from 'react'
 import { toast } from 'sonner'
-import { useState } from 'react'
-import { Button } from "@/components/ui/button"
-import { CurlCommandsDialog } from '@/components/s3/CurlCommandsDialog'
 
 export default function Page() {
   const { currentBucket, currentPath, setCurrentPath } = useBucketStore()
