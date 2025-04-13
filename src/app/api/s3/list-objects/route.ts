@@ -54,7 +54,6 @@ export async function GET(request: NextRequest) {
       endpoint: profile.endpoint || '',
       forcePathStyle: profile.forcePathStyle || false,
     })
-    console.log('prefix in route', prefix)
     const command = new ListObjectsV2Command({
       Bucket: bucket,
       MaxKeys: 100,
@@ -62,10 +61,7 @@ export async function GET(request: NextRequest) {
       Prefix: prefix || '',
       Delimiter: '/'
     })
-    console.log('command', command)
-
     const response = await client.send(command)
-    console.log('response   dddss', response)
     // Process directories
     const directories = (response.CommonPrefixes || []).map((prefix) => ({
       name: prefix.Prefix?.split('/').filter(Boolean).pop() || '',
@@ -74,7 +70,6 @@ export async function GET(request: NextRequest) {
       key: prefix.Prefix || '',
       isDirectory: true,
     }))
-    console.log('directories', directories)
     // Process files
     const files = (response.Contents || []).map((item) => ({
       name: item.Key?.split('/').pop() || '',
@@ -83,7 +78,6 @@ export async function GET(request: NextRequest) {
       key: item.Key || '',
       isDirectory: false,
     }))
-    console.log('files', files)
     
     // Return formatted response
     return NextResponse.json({
