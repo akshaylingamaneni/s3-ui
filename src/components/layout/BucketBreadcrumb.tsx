@@ -2,14 +2,14 @@
 
 import { Breadcrumb, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbItem, BreadcrumbList, BreadcrumbPage } from "@/components/ui/breadcrumb"
 import { useBucketStore } from '@/store/bucketStore'
-import { useAWSStore } from '@/store/aws-store'
+import { useAWSProfileStore } from '@/store/aws-store'
 import { Skeleton } from "@/components/ui/skeleton"
 import { useEffect, useState } from "react"
 import { Cylinder, HomeIcon, UserIcon } from "lucide-react"
 
 export function BucketBreadcrumb() {
   const { currentBucket } = useBucketStore()
-  const { activeProfile } = useAWSStore()
+  const { activeProfile } = useAWSProfileStore()
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {

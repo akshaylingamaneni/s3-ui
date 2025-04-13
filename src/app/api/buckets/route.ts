@@ -25,7 +25,6 @@ export async function POST(request: NextRequest) {
       end
     )
     const totalBuckets = await redis.zcard(`profile:${profile}:${user.id}:buckets`)
-
     return NextResponse.json({
       buckets,
       success: true,

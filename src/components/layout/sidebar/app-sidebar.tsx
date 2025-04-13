@@ -37,7 +37,7 @@ import {
 } from "@/components/ui/sidebar"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { UserProfilePopover } from "@/components/profile/user-profile-popover"
-import { useAWSStore } from "@/store/aws-store"
+import { useAWSProfileStore } from "@/store/aws-store"
 import Link from "next/link"
 
 // Temporary mock data - this will come from your bucket list later
@@ -69,7 +69,7 @@ const navSecondary = [
 
 function BucketList() {
   const [isOpen, setIsOpen] = React.useState(true)
-  const { activeProfile } = useAWSStore()
+  const { activeProfile } = useAWSProfileStore()
 
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen} className="list-none">

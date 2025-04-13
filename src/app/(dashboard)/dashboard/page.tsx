@@ -13,7 +13,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
-import { useAWSStore } from '@/store/aws-store'
+import { useAWSProfileStore } from '@/store/aws-store'
 import { S3File } from '@/hooks/useS3Files'
 import { useCallback } from 'react'
 import React from 'react'
@@ -24,7 +24,7 @@ import { CurlCommandsDialog } from '@/components/s3/CurlCommandsDialog'
 
 export default function Page() {
   const { currentBucket, currentPath, setCurrentPath } = useBucketStore()
-  const { activeProfile } = useAWSStore()
+  const { activeProfile } = useAWSProfileStore()
   const {
     files,
     isLoading,
@@ -184,8 +184,18 @@ export default function Page() {
 
       {/* Content area */}
       <div className="flex-1 mx-4">
-        {!currentBucket ? (
-          <EmptyState />
+        {!activeProfile ? (
+          <EmptyState 
+            title="No profile selected"
+            description="Select an AWS profile to get started"
+            variant="bucket"
+          />
+        ) : !currentBucket ? (
+          <EmptyState 
+            title="No bucket selected"
+            description="Select a bucket to view its contents"
+            variant="bucket"
+          />
         ) : files && files.length === 0 && !isLoading ? (
           <EmptyState 
             title="Empty bucket"
