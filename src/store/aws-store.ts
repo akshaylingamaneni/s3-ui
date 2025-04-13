@@ -7,29 +7,12 @@ interface AWSProfile {
   // add any other fields your profile has
 }
 
-interface AWSStore {
+interface AWSProfileStore {
   activeProfile: AWSProfile | null
   setActiveProfile: (profile: AWSProfile | null) => void
 }
 
-export const useAWSStore = create<AWSStore>()(
-  persist(
-    (set, get) => ({
-      activeProfile: null,
-      setActiveProfile: (profile) => {
-        set({ activeProfile: profile })
-      },
-    }),
-    {
-      name: 'aws-storage',
-      storage: createJSONStorage(() => localStorage),
-      onRehydrateStorage: () => (state) => {
-      },
-    }
-  )
-)
-
-// Add a debug subscriber
-// useAWSStore.subscribe((state) => {
-//   console.log('Store changed:', state)
-// }) 
+export const useAWSProfileStore = create<AWSProfileStore>((set) => ({
+  activeProfile: null,
+  setActiveProfile: (profile) => set({ activeProfile: profile }),
+}))

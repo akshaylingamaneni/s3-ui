@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server'
 import { S3Client, ListObjectsV2Command } from "@aws-sdk/client-s3"
-import { createS3Client } from '@/lib/aws/s3-client'
+import { getS3Client } from '@/lib/aws/s3-client'
 export async function POST(req: Request) {
   try {
     const { bucketName } = await req.json()
     
-    const client = createS3Client({
+    const client = await getS3Client({
       region: 'us-east-1',
       forcePathStyle: false,
       profileName: 'default',

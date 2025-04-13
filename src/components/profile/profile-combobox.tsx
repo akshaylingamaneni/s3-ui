@@ -27,7 +27,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { useAWSStore } from "@/store/aws-store"
+import { useAWSProfileStore } from "@/store/aws-store"
 import { AWSProfile } from "@/lib/aws/s3-client"
 
 const FormSchema = z.object({
@@ -37,7 +37,7 @@ const FormSchema = z.object({
 })
 
 export function ProfileCombobox() {
-  const { activeProfile, setActiveProfile } = useAWSStore()
+  const { activeProfile, setActiveProfile } = useAWSProfileStore()
   const [profiles, setProfiles] = useState<AWSProfile[]>([])
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -54,11 +54,6 @@ export function ProfileCombobox() {
         const data = await response.json()
         if (data.success && data.profiles) {
           setProfiles(data.profiles)
-          if (data.profiles.length > 0 && !activeProfile) {
-            const defaultProfile = data.profiles[0]
-            setActiveProfile(defaultProfile)
-            form.setValue("profile", defaultProfile.profileName)
-          }
         }
       } catch (error) {
         console.error('Failed to load profiles:', error)

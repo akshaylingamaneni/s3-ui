@@ -1,16 +1,12 @@
 'use client'
 
-import { useBuckets, useStorage } from '@/lib/hooks/useStorage'
 import { BucketItem } from '@/components/s3/BucketItem'
-import { cn } from '@/lib/utils'
-import { Loader2 } from 'lucide-react'
 import { SidebarContent } from '@/components/ui/sidebar'
+import { useBuckets } from '@/lib/hooks/useStorage'
 import { useUser } from '@clerk/nextjs'
-import { useInView } from 'react-intersection-observer'
+import { FolderIcon, Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { AWSCredentials } from "@/components/settings/aws-settings"
-import { useAWSStore } from '@/store/aws-store'
-import React from 'react'
+import { useInView } from 'react-intersection-observer'
 
 interface BucketsListProps {
   selectedProfile: string
@@ -27,6 +23,7 @@ export function BucketsList({ selectedProfile }: BucketsListProps) {
     fetchNextPage,
     isFetchingNextPage
   } = useBuckets(selectedProfile)
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false)
   const { ref, inView } = useInView()
 
   useEffect(() => {
@@ -34,6 +31,13 @@ export function BucketsList({ selectedProfile }: BucketsListProps) {
       fetchNextPage()
     }
   }, [inView, hasNextPage, fetchNextPage])
+
+  // Mark when initial loading is complete
+  useEffect(() => {
+    if (!isLoading && data) {
+      setInitialLoadComplete(true)
+    }
+  }, [isLoading, data])
 
   if (!isLoaded || isLoading) {
     return (
@@ -59,9 +63,10 @@ export function BucketsList({ selectedProfile }: BucketsListProps) {
 
   return (
     <SidebarContent className="relative">
-      {allBuckets.length === 0 ? (
-        <div className="flex items-center justify-center p-4 text-sm text-muted-foreground">
-          <span>No buckets found</span>
+      {initialLoadComplete && allBuckets.length === 0 ? (
+        <div className="flex flex-col items-center justify-center p-6 text-sm text-muted-foreground space-y-2">
+          <FolderIcon className="h-10 w-10 opacity-40" />
+          <span>No buckets available</span>
         </div>
       ) : (
         <div className="space-y-1">

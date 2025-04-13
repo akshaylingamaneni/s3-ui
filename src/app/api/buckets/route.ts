@@ -20,12 +20,11 @@ export async function POST(request: NextRequest) {
     const end = start + (Number(limit) || 50) - 1
 
     const buckets = await redis.zrange(
-      `profile:${profile}:buckets`,
+      `profile:${profile}:${user.id}:buckets`,
       start,
       end
     )
-    const totalBuckets = await redis.zcard(`profile:${profile}:buckets`)
-
+    const totalBuckets = await redis.zcard(`profile:${profile}:${user.id}:buckets`)
     return NextResponse.json({
       buckets,
       success: true,

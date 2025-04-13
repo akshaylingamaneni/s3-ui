@@ -3,7 +3,7 @@ import { currentUser } from '@clerk/nextjs/server'
 import { S3Client, ListBucketsCommand } from '@aws-sdk/client-s3'
 import redis from '@/lib/redis'
 import { decrypt } from '@/lib/encryption'
-import { createS3Client } from '@/lib/aws/s3-client'
+import { getS3Client } from '@/lib/aws/s3-client'
 
 export async function POST(req: Request) {
     try {
@@ -21,11 +21,9 @@ export async function POST(req: Request) {
             return NextResponse.json({ success: false, error: "Profile not found" }, { status: 404 })
         }
 
-        const secretAccessKey = await decrypt(profile.secretAccessKey)
 
-        const client = createS3Client({
+        const client = await getS3Client({
             ...profile,
-            secretAccessKey
         })
 
         // Get all buckets

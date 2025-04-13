@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/sidebar"
 import { UserProfilePopover } from "@/components/profile/user-profile-popover"
 import { PublicBucketForm } from "@/components/s3/public-bucket-form"
-import { useAWSStore } from '@/store/aws-store'
+import { useAWSProfileStore } from '@/store/aws-store'
 
 export interface AWSProfile {
   profileName: string
@@ -38,7 +38,7 @@ export function ProfileSwitcher() {
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false)
   const [showPublicBucketDialog, setShowPublicBucketDialog] = React.useState(false)
   
-  const { activeProfile, setActiveProfile } = useAWSStore()
+  const { activeProfile, setActiveProfile } = useAWSProfileStore()
 
   React.useEffect(() => {
     const loadProfiles = async () => {
