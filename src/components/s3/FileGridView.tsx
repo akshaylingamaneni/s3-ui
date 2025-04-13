@@ -1,7 +1,7 @@
 'use client'
 
 import { useVirtualizer } from '@tanstack/react-virtual'
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, useMemo } from 'react'
 import { S3File } from '@/hooks/useS3Files'
 import { Loader2 } from 'lucide-react'
 
@@ -22,9 +22,11 @@ export function FileGridView({ files, fetchNextPage, hasNextPage, isLoading }: F
     overscan: 10,
   })
   
+  const virtualItems = useMemo(() => virtualizer.getVirtualItems(), [virtualizer])
+  
   // Load more when scrolling to the bottom
   useEffect(() => {
-    const [lastItem] = [...virtualizer.getVirtualItems()].reverse()
+    const [lastItem] = [...virtualItems].reverse()
     
     if (
       lastItem && 
@@ -34,7 +36,7 @@ export function FileGridView({ files, fetchNextPage, hasNextPage, isLoading }: F
     ) {
       fetchNextPage()
     }
-  }, [virtualizer.getVirtualItems(), files.length, fetchNextPage, hasNextPage, isLoading])
+  }, [virtualItems, files.length, fetchNextPage, hasNextPage, isLoading])
   
   return (
     <div className="w-full h-[calc(100dvh-200px)] flex flex-col bg-zinc-800/40 rounded-lg px-4 py-4 overflow-hidden">
@@ -72,7 +74,7 @@ export function FileGridView({ files, fetchNextPage, hasNextPage, isLoading }: F
               position: 'relative',
             }}
           >
-            {virtualizer.getVirtualItems().map((virtualRow) => {
+            {virtualItems.map((virtualRow) => {
               const isLoaderRow = virtualRow.index >= files.length
               const file = isLoaderRow ? null : files[virtualRow.index]
               
