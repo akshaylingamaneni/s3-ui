@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
     if (!profile || !profile.accessKeyId || !profile.secretAccessKey) {
       return NextResponse.json(
         { error: 'Invalid or missing AWS credentials' },
-        { status: 402 }
+        { status: 401 }
       )
     }
 

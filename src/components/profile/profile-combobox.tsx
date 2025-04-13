@@ -48,7 +48,6 @@ export function ProfileCombobox() {
   })
 
   useEffect(() => {
-    console.log('activeProfile in profile-combobox', activeProfile)
     const loadProfiles = async () => {
       try {
         const response = await fetch('/api/aws/get-profiles')
