@@ -64,10 +64,14 @@
 
 ### 04/08/25
 ## TODO:
-- [ ] clean up and optimize the s3 client calls
-- [ ] optimized loading states like the brief transition before showing content
-- [ ] we have the base listing flow, start working on folder traversal and file download
+- [x] clean up and optimize the s3 client calls
+- [x] optimized loading states like the brief transition before showing content
+- [x] we have the base listing flow, start working on folder traversal and file download
 
 ###04/12/25
 - need to fix the state issue
 - think through the curl option if greater than 1000 files
+
+
+### 04/14/25
+- 
