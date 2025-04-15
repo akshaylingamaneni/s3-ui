@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/popover"
 import { useAWSProfileStore } from "@/store/aws-store"
 import { AWSProfile } from "@/lib/aws/s3-client"
+import { useBucketStore } from "@/store/bucketStore"
 
 const FormSchema = z.object({
   profile: z.string({
@@ -38,6 +39,7 @@ const FormSchema = z.object({
 
 export function ProfileCombobox() {
   const { activeProfile, setActiveProfile } = useAWSProfileStore()
+  const { setCurrentBucket, setCurrentPath } = useBucketStore()
   const [profiles, setProfiles] = useState<AWSProfile[]>([])
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -46,6 +48,11 @@ export function ProfileCombobox() {
       profile: activeProfile?.profileName || "",
     },
   })
+  const profileChange = (profile: AWSProfile) => {
+    setCurrentBucket(null)
+    setCurrentPath(null)
+    setActiveProfile(profile)
+  }
 
   useEffect(() => {
     const loadProfiles = async () => {
@@ -108,7 +115,7 @@ export function ProfileCombobox() {
                             key={profile.profileName}
                             onSelect={() => {
                               form.setValue("profile", profile.profileName)
-                              setActiveProfile(profile)
+                              profileChange(profile)
                             }}
                           >
                             <div className="flex items-center gap-2">
