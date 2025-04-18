@@ -41,7 +41,6 @@ export function AWSSetupForm() {
       });
 
       const data = await response.json();
-      console.log(data);
       if (!data.valid) {
         setValidationError(data.error || 'Invalid credentials');
       }

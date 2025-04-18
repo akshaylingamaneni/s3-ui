@@ -147,7 +147,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <SheetHeader>
                   <SheetTitle>AWS Settings</SheetTitle>
                 </SheetHeader>
-                <div className="mt-4">
+                <div className="mt-4 overflow-y-auto max-h-[calc(100vh-125px)]">
                   <AwsSettings />
                 </div>
               </SheetContent>
