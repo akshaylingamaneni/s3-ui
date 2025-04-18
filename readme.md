@@ -4,7 +4,10 @@ A modern, open-source web interface for managing Amazon S3 buckets. Built with N
 
 🚧 The repo is in very early stage right now. I am still iterating on all things that will be good to have. 
 
-![S3 UI Screenshot](screenshot.png)
+![image](https://github.com/user-attachments/assets/2ef322db-9256-40c8-9057-63aa5e2c2f67)
+![image](https://github.com/user-attachments/assets/7f68a727-5277-44b1-91ce-0007d8df3cf4)
+
+
 
 ## Features (WIP)
 
