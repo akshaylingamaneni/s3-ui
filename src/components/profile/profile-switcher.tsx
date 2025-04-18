@@ -44,7 +44,6 @@ export function ProfileSwitcher() {
     const loadProfiles = async () => {
       try {
         const response = await fetch('/api/aws/get-profiles')
-        console.log("response", response)
         const data = await response.json()
         if (data.success && data.profiles) {
           setProfiles(data.profiles)

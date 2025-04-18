@@ -20,7 +20,6 @@ export async function POST(req: Request) {
         MaxKeys: 100, // Increased to show more items
         // Removed Delimiter to show full structure
       }))
-      console.log('Response:', response)
 
       if (response.Contents || response.CommonPrefixes) {
         return NextResponse.json({ 

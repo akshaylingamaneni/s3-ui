@@ -30,7 +30,6 @@ export async function POST(req: Request) {
         
         const command = new ListBucketsCommand({})
         const response = await client.send(command)
-        console.log('response', response)
         const buckets = response.Buckets || []
 
         // Prepare buckets for sorted set
@@ -51,7 +50,6 @@ export async function POST(req: Request) {
                     return [bucket.name, bucket]
                 })
             )
-            console.log('existingMap', existingMap)
             // Find new buckets to add
             const deltaBuckets = bucketEntries.filter(bucket => !existingMap.has(bucket.name))
 
@@ -77,7 +75,6 @@ export async function POST(req: Request) {
                 if (bucketsToDelete.length > 0) {
                     await redis.zrem(`profile:${profileName}:${user.id}:buckets`, bucketsToDelete)
                 }
-                console.log('bucketsToDelete', bucketsToDelete)
 
                 // Update metadata with deletion info
                 await redis.set(`profile:${profileName}:${user.id}:metadata`, {
